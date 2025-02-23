@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_def">16dp</dimen>
+    <dimen name="margin_half">8dp</dimen>
+    <dimen name="button_corners">16dp</dimen>
+    <dimen name="icon_padding">10dp</dimen>
+    <dimen name="button_insert">0dp</dimen>
+    <dimen name="bk_button_merg">4dp</dimen>
+    <dimen name="set_icon_pad">12dp</dimen>
+    <dimen name="set_menutext_pad_startbottom">16dp</dimen>
+    <dimen name="set_menutext_pad_top">14dp</dimen>
+</resources>

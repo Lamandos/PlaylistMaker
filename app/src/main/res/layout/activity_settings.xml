@@ -20,9 +20,9 @@
             android:background="@android:color/transparent"
             android:src="@drawable/back_icon"
             app:tint="@color/yp_black"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginTop="@dimen/bk_button_merg"
+            android:layout_marginStart="@dimen/bk_button_merg"
+            android:layout_marginBottom="@dimen/bk_button_merg"
             />
 
         <TextView
@@ -47,9 +47,9 @@
             android:text="@string/dark_theme"
             android:textColor="@color/yp_black"
             style="@style/settings_theme"
-            android:paddingTop="14dp"
-            android:paddingStart="16dp"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="@dimen/set_menutext_pad_top"
+            android:paddingStart="@dimen/set_menutext_pad_startbottom"
+            android:paddingBottom="@dimen/set_menutext_pad_startbottom"/>
 
         <Switch
             android:layout_width="wrap_content"
@@ -70,15 +70,15 @@
             android:text="@string/share"
             android:textColor="@color/yp_black"
             style="@style/settings_theme"
-            android:paddingTop="14dp"
-            android:paddingStart="16dp"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="@dimen/set_menutext_pad_top"
+            android:paddingStart="@dimen/set_menutext_pad_startbottom"
+            android:paddingBottom="@dimen/set_menutext_pad_startbottom"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
-            android:paddingEnd="12dp"
+            android:paddingEnd="@dimen/set_icon_pad"
             app:srcCompat="@drawable/share_icon"
             app:tint="@color/yp_gray"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
@@ -95,15 +95,15 @@
             android:text="@string/support"
             android:textColor="@color/yp_black"
             style="@style/settings_theme"
-            android:paddingTop="14dp"
-            android:paddingStart="16dp"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="@dimen/set_menutext_pad_top"
+            android:paddingStart="@dimen/set_menutext_pad_startbottom"
+            android:paddingBottom="@dimen/set_menutext_pad_startbottom"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
-            android:paddingEnd="12dp"
+            android:paddingEnd="@dimen/set_icon_pad"
             app:srcCompat="@drawable/support_icon"
             app:tint="@color/yp_gray"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
@@ -120,15 +120,15 @@
             android:text="@string/license_agreement"
             android:textColor="@color/yp_black"
             style="@style/settings_theme"
-            android:paddingTop="14dp"
-            android:paddingStart="16dp"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="@dimen/set_menutext_pad_top"
+            android:paddingStart="@dimen/set_menutext_pad_startbottom"
+            android:paddingBottom="@dimen/set_menutext_pad_startbottom"/>
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
-            android:paddingEnd="12dp"
+            android:paddingEnd="@dimen/set_icon_pad"
             app:srcCompat="@drawable/arrow_forward_icon"
             app:tint="@color/yp_gray"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
