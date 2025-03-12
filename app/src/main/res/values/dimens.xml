@@ -11,7 +11,7 @@
     <dimen name="set_menutext_pad_top">14dp</dimen>
     <dimen name="search_icon_padding">14dp</dimen>
     <dimen name="search_bar_high">36dp</dimen>
-    <dimen name="search_bar_clear_icon">20dp</dimen>
-    <dimen name="search_bar_ci_merg">25dp</dimen>
-    <dimen name="search_bar_text_merg">35dp</dimen>
+    <dimen name="search_bar_clear_icon">16dp</dimen>
+    <dimen name="search_bar_ci_merg">28dp</dimen>
+    <dimen name="search_bar_text_merg">40dp</dimen>
 </resources>

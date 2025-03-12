@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -34,8 +35,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val agreementButton: ImageView = findViewById(R.id.agreement)
-
         agreementButton.setOnClickListener {
+            openUserAgreement()
+        }
+
+        val agreementText: TextView = findViewById(R.id.agreementText)
+        agreementText.setOnClickListener {
             openUserAgreement()
         }
 
@@ -44,9 +49,18 @@ class SettingsActivity : AppCompatActivity() {
             shareApp()
         }
 
-        val writeToSupportButton: ImageView = findViewById(R.id.support)
+        val shareText: TextView = findViewById(R.id.shareText)
+        shareText.setOnClickListener {
+            shareApp()
+        }
 
+        val writeToSupportButton: ImageView = findViewById(R.id.support)
         writeToSupportButton.setOnClickListener {
+            sendEmailToSupport()
+        }
+
+        val writeToSupportText: TextView = findViewById(R.id.supportText)
+        writeToSupportText.setOnClickListener {
             sendEmailToSupport()
         }
     }

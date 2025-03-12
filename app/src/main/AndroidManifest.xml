@@ -14,21 +14,21 @@
         tools:targetApi="31">
         <activity
             android:name=".SearchActivity"
-            android:exported="false" />
+            android:theme="@style/Theme.SearchScreen"
+            android:exported="true" />
         <activity
             android:name=".MediaActivity"
             android:exported="false" />
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/Theme.SettingsScreen"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.MainScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -22,7 +22,6 @@ class SearchActivity : AppCompatActivity() {
 
     private var userText: String = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -78,9 +77,13 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    object BundleKeys {
+        const val SEARCH_TEXT = "userText"
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("searchText", userText)
+        outState.putString(BundleKeys.SEARCH_TEXT, userText)
         val cursorPosition = findViewById<EditText>(R.id.search_field).selectionStart
         outState.putInt("cursorPosition", cursorPosition)
     }
@@ -88,7 +91,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        userText = savedInstanceState.getString("searchText", "")
+        userText = savedInstanceState.getString(BundleKeys.SEARCH_TEXT, "")
         val inputEditText = findViewById<EditText>(R.id.search_field)
         inputEditText.setText(userText)
         val cursorPosition = savedInstanceState.getInt("cursorPosition", 0)
