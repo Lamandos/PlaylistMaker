@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="menu_theme_header">
+    <item name="android:textColor">@color/white</item>
+    <item name="android:textSize">22sp</item>
+    <item name="android:fontFamily">@font/ys_text_medium</item>
+    <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="settings_theme_header">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/ys_text_medium</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="menu_theme" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/ys_text_medium</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:insetTop">@dimen/button_insert</item>
+        <item name="android:insetBottom">@dimen/button_insert</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="cornerRadius">@dimen/button_corners</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/icon_padding</item>
+        <item name="iconTint">@color/yp_black</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="settings_theme">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:paddingTop">@dimen/set_menutext_pad_top</item>
+        <item name="android:paddingStart">@dimen/set_menutext_pad_startbottom</item>
+        <item name="android:paddingBottom">@dimen/set_menutext_pad_startbottom</item>
+    </style>
+
+    <style name="settings_btns">
+        <item name="android:tint">@color/white</item>
+    </style>
+
+    <style name="day_night_switch">
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="colorSwitchThumbNormal">@color/yp_gray</item>
+        <item name="android:colorForeground">@color/yp_light_gray</item>
+    </style>
+
+    <style name="search_bar">
+        <item name="android:layout_marginStart">@dimen/margin_def</item>
+        <item name="android:layout_marginTop">@dimen/margin_half</item>
+        <item name="android:layout_marginBottom">@dimen/margin_half</item>
+        <item name="android:layout_marginEnd">@dimen/margin_def</item>
+        <item name="android:background">@drawable/search_corners_day</item>
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textColorHint">@color/yp_black</item>
+        <item name="android:drawableTint">@color/yp_black</item>
+    </style>
+
+    <style name="search_clear_icon">
+        <item name="android:layout_width">@dimen/search_bar_clear_icon</item>
+        <item name="android:layout_height">@dimen/search_bar_clear_icon</item>
+        <item name="android:layout_marginEnd">@dimen/search_bar_ci_merg</item>
+        <item name="android:background">@drawable/clear_btn</item>
+        <item name="android:backgroundTint">@color/yp_black</item>
+        <item name="android:layout_gravity">center|end</item>
+    </style>
+
+    <style name="settings_btn_back_style">
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+</resources>

@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue"
     android:orientation="vertical"
+    tools:context=".MainActivity"
     android:padding="0dp">
 
     <FrameLayout
@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:text="@string/title"
-            android:textColor="@color/white"
-            style="@style/menu_theme"
+            style="@style/menu_theme_header"
             android:paddingTop="14dp"
             android:paddingStart="16dp"
             android:paddingBottom="16dp"/>
@@ -37,45 +36,25 @@
             android:id="@+id/search_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:layout_marginEnd="@dimen/margin_def"
             android:layout_marginStart="@dimen/margin_def"
             android:layout_marginBottom="@dimen/margin_half"
-            android:insetTop="@dimen/button_insert"
-            android:insetBottom="@dimen/button_insert"
             android:text="@string/search_btn_text"
             style="@style/menu_theme"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            app:cornerRadius="@dimen/button_corners"
-            app:icon="@drawable/search_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/icon_padding"
-            app:iconTint="@color/black" />
+            app:icon="@drawable/search_icon" />
 
 
         <Button
             android:id="@+id/media_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:layout_marginEnd="@dimen/margin_def"
             android:layout_marginStart="@dimen/margin_def"
             android:layout_marginTop="@dimen/margin_half"
             android:layout_marginBottom="@dimen/margin_half"
-            android:insetTop="@dimen/button_insert"
-            android:insetBottom="@dimen/button_insert"
             android:text="@string/media_btn_text"
             style="@style/menu_theme"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            app:cornerRadius="@dimen/button_corners"
-            app:icon="@drawable/media_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/icon_padding"
-            app:iconTint="@color/black" />
+            app:icon="@drawable/media_icon" />
 
         <Button
             android:id="@+id/settings_btn"
@@ -84,18 +63,8 @@
             android:layout_marginStart="@dimen/margin_def"
             android:layout_marginTop="@dimen/margin_half"
             android:layout_marginEnd="@dimen/margin_def"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
-            android:insetTop="@dimen/button_insert"
-            android:insetBottom="@dimen/button_insert"
             android:text="@string/options_btn_text"
             style="@style/menu_theme"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            app:cornerRadius="@dimen/button_corners"
-            app:icon="@drawable/options_icon"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/icon_padding"
-            app:iconTint="@color/black"/>
+            app:icon="@drawable/options_icon" />
     </LinearLayout>
 </LinearLayout>

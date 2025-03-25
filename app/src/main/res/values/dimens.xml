@@ -9,4 +9,9 @@
     <dimen name="set_icon_pad">12dp</dimen>
     <dimen name="set_menutext_pad_startbottom">16dp</dimen>
     <dimen name="set_menutext_pad_top">14dp</dimen>
+    <dimen name="search_icon_padding">14dp</dimen>
+    <dimen name="search_bar_high">36dp</dimen>
+    <dimen name="search_bar_clear_icon">16dp</dimen>
+    <dimen name="search_bar_ci_merg">28dp</dimen>
+    <dimen name="search_bar_text_merg">40dp</dimen>
 </resources>
