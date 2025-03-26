@@ -14,4 +14,7 @@
     <dimen name="search_bar_clear_icon">16dp</dimen>
     <dimen name="search_bar_ci_merg">28dp</dimen>
     <dimen name="search_bar_text_merg">40dp</dimen>
+    <dimen name="padding_cover">13dp</dimen>
+    <dimen name="padding_info">12dp</dimen>
+    <dimen name="cover_size">45dp</dimen>
 </resources>
