@@ -24,7 +24,7 @@ class SearchActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
 
     private var userText: String = ""
-    private lateinit var trackList: ArrayList<Track>
+    private lateinit var trackList: MutableList<Track>
 
 
     @SuppressLint("MissingInflatedId")
@@ -71,7 +71,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun music() {
-        trackList = arrayListOf(
+        trackList = mutableListOf(
             Track(
                 trackName = "Smells Like Teen Spirit",
                 artistName = "Nirvana",
