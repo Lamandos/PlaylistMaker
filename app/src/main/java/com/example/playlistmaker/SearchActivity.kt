@@ -126,7 +126,9 @@ class SearchActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-
+                withContext(Dispatchers.Main) {
+                    trackList.clear()
+                    trackAdapter.updateTracks(trackList)}
                 val response: Response<SearchResponse> = RetrofitClient.api.searchTracks(query)
 
                 if (response.isSuccessful && response.body() != null) {
@@ -139,7 +141,6 @@ class SearchActivity : AppCompatActivity() {
                             showNoResults(false)
                             showNetworkError(false)
                         } else {
-
                             showNoResults(true)
                             showNetworkError(false)
                         }
