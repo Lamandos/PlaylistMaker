@@ -46,12 +46,13 @@ android:orientation="vertical">
             style="@style/search_bar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/search_bar_high"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
             android:drawableStart="@drawable/searchbar_icon"
             android:drawablePadding="@dimen/margin_half"
             android:hint="@string/search_btn_text"
             android:inputType="text"
             android:maxLength="255"
-            android:maxLines="1"
             android:paddingStart="@dimen/search_icon_padding"
             android:paddingEnd="@dimen/search_bar_text_merg"
             android:textCursorDrawable="@drawable/text_cursor_color" />
@@ -62,7 +63,7 @@ android:orientation="vertical">
             android:visibility="gone" />
 
     </FrameLayout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -72,6 +73,68 @@ android:orientation="vertical">
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/no_results"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center|top"
+            android:paddingTop="102dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/no_results_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NoResultsImage" />
+
+            <TextView
+                style="@style/search_error"
+                android:id="@+id/no_results_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_nothing" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/network_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center|top"
+            android:paddingTop="102dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/network_error_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/NetworkErrorImage" />
+
+            <TextView
+                style="@style/search_error"
+                android:id="@+id/network_error_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/net_error" />
+            <TextView
+                style="@style/search_error"
+                android:id="@+id/network_error_message2"
+                android:layout_width="wrap_content"
+                android:paddingTop="@dimen/error_text"
+                android:layout_height="wrap_content"
+                android:text="@string/net_error2"
+                android:gravity="center"/>
+
+            <Button
+                style="@style/refresh_btn"
+                android:id="@+id/refresh_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/refresh_btn"
+                android:text="@string/refresh_btn_text" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

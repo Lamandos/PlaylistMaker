@@ -14,4 +14,8 @@
     <string name="mail_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="rec_email">lamand704@gmail.com</string>
     <string name="share_opt">Поделиться через</string>
+    <string name="search_nothing">Ничего не нашлось</string>
+    <string name="net_error2">Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="net_error">Проблемы со связью</string>
+    <string name="refresh_btn_text">Обновить</string>
 </resources>
