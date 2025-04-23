@@ -16,8 +16,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+import android.content.SharedPreferences
+import androidx.appcompat.widget.SwitchCompat
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var sharedPreferences: SharedPreferences
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +66,19 @@ class SettingsActivity : AppCompatActivity() {
         val writeToSupportText: TextView = findViewById(R.id.supportText)
         writeToSupportText.setOnClickListener {
             sendEmailToSupport()
+        }
+
+        sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
+
+        val themeSwitcher: SwitchCompat = findViewById(R.id.theme_switch)
+        val isDarkModeEnabled = (applicationContext as App).darkTheme
+        themeSwitcher.isChecked = isDarkModeEnabled
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            (applicationContext as App).switchTheme(checked)
+
+            sharedPreferences.edit()
+                .putBoolean("dark_mode", checked)
+                .apply()
         }
     }
 

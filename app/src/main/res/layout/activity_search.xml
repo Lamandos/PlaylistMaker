@@ -96,6 +96,9 @@ android:orientation="vertical">
                 android:layout_height="wrap_content"
                 android:text="@string/search_nothing" />
         </LinearLayout>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <LinearLayout
             android:id="@+id/network_error"
             android:layout_width="match_parent"
@@ -133,8 +136,41 @@ android:orientation="vertical">
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/refresh_btn"
                 android:text="@string/refresh_btn_text" />
+        </LinearLayout>
+        </ScrollView>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/history_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center|top"
+            android:paddingTop="42dp"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/history"
+                android:id="@+id/history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                style="@style/clear_history_btn"
+                android:id="@+id/clear_history_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/refresh_btn"
+                android:text="@string/clear_history" />
 
         </LinearLayout>
-
+        </ScrollView>
     </LinearLayout>
 </LinearLayout>
