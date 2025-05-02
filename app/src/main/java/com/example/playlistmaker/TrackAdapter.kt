@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.databinding.ActivityMainBinding
 import com.example.playlistmaker.databinding.TrackBinding
 
-class TrackAdapter(private var tracks: MutableList<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = TrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -32,7 +32,8 @@ class TrackAdapter(private var tracks: MutableList<Track>) : RecyclerView.Adapte
         notifyDataSetChanged()
     }
 
-    inner class TrackViewHolder(private val binding: TrackBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class TrackViewHolder(private val binding: TrackBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(track: Track) {
             binding.song.text = track.trackName
             binding.artistName.text = track.artistName
@@ -40,12 +41,16 @@ class TrackAdapter(private var tracks: MutableList<Track>) : RecyclerView.Adapte
             Glide.with(binding.cover.context).load(track.artworkUrl100)
                 .placeholder(R.drawable.placeholder)
                 .into(binding.cover)
-        }
-    }
 
-    private fun formatTrackTime(timeInMillis: Long): String {
-        val minutes = timeInMillis / 60000
-        val seconds = (timeInMillis % 60000) / 1000
-        return String.format("%02d:%02d", minutes, seconds)
+            binding.root.setOnClickListener {
+                onTrackClick(track)
+            }
+        }
+
+        private fun formatTrackTime(timeInMillis: Long): String {
+            val minutes = timeInMillis / 60000
+            val seconds = (timeInMillis % 60000) / 1000
+            return String.format("%02d:%02d", minutes, seconds)
+        }
     }
 }
