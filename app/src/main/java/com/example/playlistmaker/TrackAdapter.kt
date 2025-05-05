@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.databinding.TrackBinding
 
 class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
@@ -40,6 +40,7 @@ class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackCli
             binding.trackTime.text = formatTrackTime(track.trackTimeMillis)
             Glide.with(binding.cover.context).load(track.artworkUrl100)
                 .placeholder(R.drawable.placeholder)
+                .transform(RoundedCorners(16))
                 .into(binding.cover)
 
             binding.root.setOnClickListener {
