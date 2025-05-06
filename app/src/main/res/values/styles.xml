@@ -134,4 +134,46 @@
         <item name="android:stateListAnimator">@null</item>
     </style>
 
+    <style name="player_title">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="player_artist">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="player_info_main">
+        <item name="android:textColor">@color/yp_gray</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:paddingStart">16dp</item>
+    </style>
+
+    <style name="player_info">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:maxLength">40</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+
+
 </resources>
