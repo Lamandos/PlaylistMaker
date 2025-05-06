@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -54,11 +55,13 @@ class PlayerActivity  : AppCompatActivity() {
             } else {
                 albumTextView.visibility = View.GONE
             }
-
+            fun Context.dpToPx(dp: Int): Int {
+                return (dp * resources.displayMetrics.density).toInt()
+            }
             Glide.with(this)
                 .load(it.getCoverArtwork())
                 .placeholder(R.drawable.placeholder)
-                .transform(RoundedCorners(16))
+                .transform(RoundedCorners(dpToPx(16)))
                 .into(albumCoverImageView)
 
             val backButton = findViewById<ImageButton>(R.id.backButton)
@@ -76,7 +79,6 @@ class PlayerActivity  : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable("track", currentTrack)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

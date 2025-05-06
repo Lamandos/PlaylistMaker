@@ -15,6 +15,6 @@
         <item name="tint">@color/yp_black</item>
     </style>
     <style name="Theme.PlayerScreen_add_like" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="tint">@color/yp_gray</item>
+        <item name="tint">@color/white</item>
     </style>
 </resources>
