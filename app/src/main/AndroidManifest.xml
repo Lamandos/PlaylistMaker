@@ -21,6 +21,8 @@
             android:name=".MediaActivity"
             android:exported="false" />
         <activity
+            android:name=".PlayerActivity"/>
+        <activity
             android:name=".SettingsActivity"
             android:theme="@style/Theme.SettingsScreen"
             android:exported="true" />

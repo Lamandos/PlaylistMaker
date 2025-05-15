@@ -3,6 +3,7 @@ package com.example.playlistmaker
 import SearchHistory
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
@@ -55,6 +56,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         searchHistory = SearchHistory(getSharedPreferences("app_preferences", Context.MODE_PRIVATE))
         noResultsLayout = findViewById(R.id.no_results)
         networkErrorLayout = findViewById(R.id.network_error)
@@ -65,6 +67,10 @@ class SearchActivity : AppCompatActivity() {
 
         trackAdapter = TrackAdapter(trackList) { track ->
             addToSearchHistory(track)
+            val intent = Intent(this, PlayerActivity::class.java).apply {
+                putExtra("track", track)
+            }
+            startActivity(intent)
         }
 
         historyLayout = findViewById(R.id.history_list)
@@ -89,7 +95,6 @@ class SearchActivity : AppCompatActivity() {
         }
 
         queryInput.setOnFocusChangeListener { _, hasFocus ->
-
             if (hasFocus && queryInput.text.isNullOrEmpty()) {
                 showSearchHistory(true)
             } else {
@@ -193,11 +198,14 @@ class SearchActivity : AppCompatActivity() {
         if (show && history.isNotEmpty()) {
             val historyAdapter = TrackAdapter(history.toMutableList()) { track ->
                 addToSearchHistory(track)
+                val intent = Intent(this, PlayerActivity::class.java).apply {
+                    putExtra("track", track)
+                }
+                startActivity(intent)
             }
             historyRecyclerView.adapter = historyAdapter
         }
     }
-
 
     private fun showNoResults(show: Boolean) {
         noResultsLayout.visibility = if (show) View.VISIBLE else View.GONE
@@ -222,15 +230,20 @@ class SearchActivity : AppCompatActivity() {
 
     private fun addToSearchHistory(track: Track) {
         searchHistory.addToSearchHistory(track)
+        if (historyLayout.visibility == View.VISIBLE) {
+            showSearchHistory(true)
+        }
     }
 
     private fun clearSearchHistory() {
         searchHistory.clearSearchHistory()
         showSearchHistory(false)
     }
+
     object BundleKeys {
         const val SEARCH_TEXT = "userText"
     }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(BundleKeys.SEARCH_TEXT, userText)
@@ -270,4 +283,3 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 }
-
