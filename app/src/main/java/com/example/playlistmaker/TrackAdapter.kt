@@ -1,13 +1,24 @@
 package com.example.playlistmaker
 
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.postDelayed
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.databinding.TrackBinding
 
 class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    companion object {
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
+
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = TrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,6 +41,15 @@ class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackCli
     fun clearTracks() {
         tracks.clear()
         notifyDataSetChanged()
+    }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 
     inner class TrackViewHolder(private val binding: TrackBinding) :

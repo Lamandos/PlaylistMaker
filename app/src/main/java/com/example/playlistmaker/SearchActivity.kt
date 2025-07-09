@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import android.os.Handler
+import android.os.Looper
 
 class SearchActivity : AppCompatActivity() {
 
@@ -45,7 +48,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyTitle: TextView
     private lateinit var clearHistoryButton: Button
     private lateinit var searchHistory: SearchHistory
+    private lateinit var progressBar: ProgressBar
     private var isFirstSearch = true
+
+    private val searchDebounceDelay = 2000L
+    private lateinit var searchHandler: Handler
+    private var searchRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,14 +110,35 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
+        progressBar = findViewById(R.id.progressBar)
+
+        searchHandler = Handler(Looper.getMainLooper())
+
         queryInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+
                 if (!s.isNullOrEmpty()) {
                     showSearchHistory(false)
+
+                    searchRunnable = Runnable {
+                        val query = s.toString().trim()
+                        if (query.isNotEmpty()) {
+                            searchTracks(query)
+                        }
+                    }
+                    searchHandler.postDelayed(searchRunnable!!, searchDebounceDelay)
+                } else {
+                    trackList.clear()
+                    trackAdapter.updateTracks(trackList)
+                    isFirstSearch = true
+                    updateUI()
+                    showSearchHistory(true)
                 }
-                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -117,7 +146,9 @@ class SearchActivity : AppCompatActivity() {
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val query = queryInput.text.toString()
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+
+                val query = queryInput.text.toString().trim()
                 if (query.isNotEmpty()) {
                     searchTracks(query)
                     hideKeyboard()
@@ -145,8 +176,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchTracks(query: String) {
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
         isFirstSearch = false
         userText = query
+        resetSearchState()
+        progressBar.visibility = View.VISIBLE
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -156,8 +190,10 @@ class SearchActivity : AppCompatActivity() {
                 }
                 val response: Response<SearchResponse> = RetrofitClient.api.searchTracks(query)
 
-                if (response.isSuccessful && response.body() != null) {
-                    withContext(Dispatchers.Main) {
+                withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.GONE
+
+                    if (response.isSuccessful && response.body() != null) {
                         val result = response.body()!!
                         if (result.resultCount > 0) {
                             trackList = result.results.toMutableList()
@@ -165,25 +201,32 @@ class SearchActivity : AppCompatActivity() {
                             showNoResults(false)
                             showNetworkError(false)
                         } else {
+                            trackList.clear()
+                            trackAdapter.updateTracks(trackList)
                             showNoResults(true)
                             showNetworkError(false)
                         }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
+                    } else {
+                        trackList.clear()
+                        trackAdapter.updateTracks(trackList)
                         showNoResults(true)
                         showNetworkError(false)
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.GONE
                     showNoResults(false)
                     showNetworkError(true)
                 }
             }
         }
     }
-
+    private fun resetSearchState() {
+        progressBar.visibility = View.GONE
+        showNoResults(false)
+        showNetworkError(false)
+    }
     private fun updateUI() {
         showNoResults(trackList.isEmpty() && !isFirstSearch)
         showNetworkError(false)
@@ -281,5 +324,9 @@ class SearchActivity : AppCompatActivity() {
         if (userText.isEmpty() && inputEditText.hasFocus() && history.isNotEmpty()) {
             showSearchHistory(true)
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
     }
 }
