@@ -69,6 +69,14 @@ android:orientation="vertical">
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
+        <ProgressBar android:id="@+id/progressBar"
+            android:layout_width="@dimen/pb_size"
+            android:layout_height="@dimen/pb_size"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/pb_top"
+            android:indeterminateTint="@color/blue"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"

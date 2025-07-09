@@ -19,4 +19,6 @@
     <dimen name="cover_size">45dp</dimen>
     <dimen name="refresh_btn">24dp</dimen>
     <dimen name="error_text">20dp</dimen>
+    <dimen name="pb_size">44dp</dimen>
+    <dimen name="pb_top">140dp</dimen>
 </resources>
