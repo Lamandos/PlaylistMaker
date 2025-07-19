@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".PlayerActivity">
+    tools:context=".ui.activity.PlayerActivity">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineStart"

@@ -1,24 +1,21 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.activity
 
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.os.postDelayed
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.TrackBinding
+import com.example.playlistmaker.presentation.TrackParcelable
+import com.example.playlistmaker.ui.utils.formatTrackTime
+class TrackAdapter(private var tracks: MutableList<TrackParcelable>, private val onTrackClick: (TrackParcelable) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
-
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
-    }
-
-    private var isClickAllowed = true
-
-    private val handler = Handler(Looper.getMainLooper())
+//    private var isClickAllowed = true
+//
+//    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = TrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -32,29 +29,29 @@ class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackCli
 
     override fun getItemCount() = tracks.size
 
-    fun updateTracks(newTracks: List<Track>) {
+    fun updateTracks(newTracks: List<TrackParcelable>) {
         tracks.clear()
         tracks.addAll(newTracks)
         notifyDataSetChanged()
     }
 
-    fun clearTracks() {
-        tracks.clear()
-        notifyDataSetChanged()
-    }
-
-    private fun clickDebounce() : Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
-    }
+//    fun clearTracks() {
+//        tracks.clear()
+//        notifyDataSetChanged()
+//    }
+//
+//    private fun clickDebounce() : Boolean {
+//        val current = isClickAllowed
+//        if (isClickAllowed) {
+//            isClickAllowed = false
+//            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+//        }
+//        return current
+//    }
 
     inner class TrackViewHolder(private val binding: TrackBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(track: Track) {
+        fun bind(track: TrackParcelable) {
             binding.song.text = track.trackName
             binding.artistName.text = track.artistName
             binding.trackTime.text = formatTrackTime(track.trackTimeMillis)
@@ -68,10 +65,8 @@ class TrackAdapter(private var tracks: MutableList<Track>,private val onTrackCli
             }
         }
 
-        private fun formatTrackTime(timeInMillis: Long): String {
-            val minutes = timeInMillis / 60000
-            val seconds = (timeInMillis % 60000) / 1000
-            return String.format("%02d:%02d", minutes, seconds)
-        }
     }
+//    companion object {
+//        private const val CLICK_DEBOUNCE_DELAY = 1000L
+//    }
 }
