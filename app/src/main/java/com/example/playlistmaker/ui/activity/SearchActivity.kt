@@ -33,16 +33,24 @@ import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.models.toParcelable
 import com.example.playlistmaker.presentation.TrackParcelable
 import com.example.playlistmaker.presentation.toDomain
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var trackAdapter: TrackAdapter
-    private lateinit var historyAdapter: TrackAdapter
+    private val trackAdapter: TrackAdapter by lazy {
+        TrackAdapter(mutableListOf()) { track ->
+            addToSearchHistory(track)
+            navigateToPlayer(track)
+        }
+    }
+
+    private val historyAdapter: TrackAdapter by lazy {
+        TrackAdapter(mutableListOf()) { track ->
+            addToSearchHistory(track)
+            navigateToPlayer(track)
+        }
+    }
+
     private val trackList = mutableListOf<TrackParcelable>()
     private var userText = ""
     private lateinit var noResultsLayout: LinearLayout
@@ -60,11 +68,10 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         searchTracksInteractor = Creator.searchTracksInteractor
+        historyInteractor = Creator.searchHistoryInteractor
 
         setContentView(R.layout.activity_search)
-        initDependencies()
 
         enableEdgeToEdge()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { v, insets ->
@@ -78,17 +85,7 @@ class SearchActivity : AppCompatActivity() {
         setupSearchField()
         restoreState(savedInstanceState)
     }
-    private fun initDependencies() {
-        historyInteractor = Creator.provideSearchHistoryInteractor(applicationContext)
-        trackAdapter = Creator.provideTrackAdapter { track ->
-            addToSearchHistory(track)
-            navigateToPlayer(track)
-        }
-        historyAdapter = Creator.provideTrackAdapter { track ->
-            addToSearchHistory(track)
-            navigateToPlayer(track)
-        }
-    }
+
     private fun initViews() {
         noResultsLayout = findViewById(R.id.no_results)
         networkErrorLayout = findViewById(R.id.network_error)
@@ -141,28 +138,26 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun createTextWatcher(): TextWatcher {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+    private fun createTextWatcher(): TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                findViewById<ImageView>(R.id.clear_icon).visibility =
-                    if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            findViewById<ImageView>(R.id.clear_icon).visibility =
+                if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+            searchRunnable?.let { searchHandler.removeCallbacks(it) }
 
-                if (!s.isNullOrEmpty()) {
-                    showSearchHistory(false)
-                    searchRunnable = Runnable { performSearch(s.toString().trim()) }
-                    searchHandler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
-                } else {
-                    clearSearchResults()
-                    showSearchHistory(true)
-                }
+            if (!s.isNullOrEmpty()) {
+                showSearchHistory(false)
+                searchRunnable = Runnable { performSearch(s.toString().trim()) }
+                searchHandler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
+            } else {
+                clearSearchResults()
+                showSearchHistory(true)
             }
-
-            override fun afterTextChanged(s: Editable?) {}
         }
+
+        override fun afterTextChanged(s: Editable?) {}
     }
 
     private fun performSearch(query: String) {
@@ -187,36 +182,27 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter.updateTracks(trackList)
         progressBar.visibility = View.VISIBLE
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             try {
-                val result = Creator.searchTracksInteractor.searchTracks(query)
-
-                withContext(Dispatchers.Main) {
-                    progressBar.visibility = View.GONE
-                    handleSearchResult(result)
-                }
-
+                val result = searchTracksInteractor.searchTracks(query)
+                progressBar.visibility = View.GONE
+                handleSearchResult(result)
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    handleSearchError()
-                }
+                progressBar.visibility = View.GONE
+                handleSearchError()
             }
         }
     }
 
     private fun handleSearchResult(tracks: List<Track>) {
-        progressBar.visibility = View.GONE
         trackList.clear()
         trackList.addAll(tracks.map { it.toParcelable() })
         trackAdapter.updateTracks(trackList)
 
-        when {
-            tracks.isNotEmpty() -> showSearchResults()
-            else -> showNoResults()
-        }
+        if (tracks.isNotEmpty()) showSearchResults() else showNoResults()
     }
+
     private fun handleSearchError() {
-        progressBar.visibility = View.GONE
         trackList.clear()
         trackAdapter.updateTracks(trackList)
         showNetworkError(true)
@@ -269,60 +255,35 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun addToSearchHistory(track: TrackParcelable) {
-        lifecycleScope.launch {
-            try {
-                val domainTrack = track.toDomain()
-                historyInteractor.addTrack(domainTrack)
-
-                withContext(Dispatchers.Main) {
-                    if (historyLayout.isVisible) {
-                        loadSearchHistory()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        val domainTrack = track.toDomain()
+        historyInteractor.addTrack(domainTrack)
+        if (historyLayout.isVisible) loadSearchHistory()
     }
+
     private fun loadSearchHistory() {
         val history = historyInteractor.getHistory()
-        val parcelableHistory = history.map { it.toParcelable() }
-        historyAdapter.updateTracks(parcelableHistory.toMutableList())
+        historyAdapter.updateTracks(history.map { it.toParcelable() }.toMutableList())
     }
 
     private fun showSearchHistory(show: Boolean) {
-        lifecycleScope.launch {
-            try {
-                val history = historyInteractor.getHistory()
-                val shouldShowHistory = show && history.isNotEmpty()
+        val history = historyInteractor.getHistory()
+        val shouldShowHistory = show && history.isNotEmpty()
 
-                withContext(Dispatchers.Main) {
-                    historyLayout.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
-                    historyTitle.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
-                    clearHistoryButton.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
+        historyLayout.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
+        historyTitle.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
+        clearHistoryButton.visibility = if (shouldShowHistory) View.VISIBLE else View.GONE
 
-                    if (shouldShowHistory) {
-                        val parcelableHistory = history.map { it.toParcelable() }
-                        historyAdapter.updateTracks(parcelableHistory.toMutableList())
-                    }
-                }
-            } catch (e: Exception) {
-            }
+        if (shouldShowHistory) {
+            historyAdapter.updateTracks(history.map { it.toParcelable() }.toMutableList())
         }
     }
+
     private fun clearSearchHistory() {
-        lifecycleScope.launch {
-            try {
-                historyInteractor.clear()
-                withContext(Dispatchers.Main) {
-                    historyAdapter.updateTracks(mutableListOf())
-                    historyLayout.visibility = View.GONE
-                    historyTitle.visibility = View.GONE
-                    clearHistoryButton.visibility = View.GONE
-                }
-            } catch (e: Exception) {
-            }
-        }
+        historyInteractor.clear()
+        historyAdapter.updateTracks(mutableListOf())
+        historyLayout.visibility = View.GONE
+        historyTitle.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -354,15 +315,12 @@ class SearchActivity : AppCompatActivity() {
             showNetworkError(it.getBoolean("networkErrorVisible", false))
 
             if (userText.isEmpty() && findViewById<EditText>(R.id.search_field).hasFocus()) {
-                lifecycleScope.launch {
-                    val history = historyInteractor.getHistory()
-                    if (history.isNotEmpty()) {
-                        showSearchHistory(true)
-                    }
-                }
+                val history = historyInteractor.getHistory()
+                if (history.isNotEmpty()) showSearchHistory(true)
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         val queryInput = findViewById<EditText>(R.id.search_field)
@@ -372,11 +330,12 @@ class SearchActivity : AppCompatActivity() {
             showSearchHistory(false)
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         searchRunnable?.let { searchHandler.removeCallbacks(it) }
-
     }
+
     private companion object {
         const val SEARCH_DEBOUNCE_DELAY = 2000L
     }

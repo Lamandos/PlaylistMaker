@@ -10,7 +10,7 @@ import com.example.playlistmaker.presentation.state.PlayerState
 import com.example.playlistmaker.ui.utils.formatTrackTime
 
 class PlayerViewModel(
-    private val player: PlayerInteractor
+    private val interactor: PlayerInteractor
 ) : ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -25,15 +25,15 @@ class PlayerViewModel(
 
     private val progressRunnable = object : Runnable {
         override fun run() {
-            if (player.isPlaying()) {
-                _currentTime.postValue(formatTrackTime(player.currentPosition().toLong()))
+            if (interactor.isPlaying()) {
+                _currentTime.postValue(formatTrackTime(interactor.currentPosition().toLong()))
                 handler.postDelayed(this, 300L)
             }
         }
     }
 
     fun preparePlayer(url: String) {
-        player.prepare(
+        interactor.prepare(
             url,
             onPrepared = {
                 _playerState.postValue(PlayerState.Prepared)
@@ -55,21 +55,21 @@ class PlayerViewModel(
     }
 
     private fun play() {
-        player.seekTo(playbackPosition)
-        player.play()
+        interactor.seekTo(playbackPosition)
+        interactor.play()
         _playerState.postValue(PlayerState.Playing)
         handler.post(progressRunnable)
     }
 
     fun pause() {
-        playbackPosition = player.currentPosition()
-        player.pause()
+        playbackPosition = interactor.currentPosition()
+        interactor.pause()
         _playerState.postValue(PlayerState.Paused)
         handler.removeCallbacks(progressRunnable)
     }
 
     fun release() {
         handler.removeCallbacksAndMessages(null)
-        player.release()
+        interactor.release()
     }
 }

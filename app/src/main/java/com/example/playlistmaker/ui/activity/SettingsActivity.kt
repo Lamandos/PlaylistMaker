@@ -1,57 +1,61 @@
 package com.example.playlistmaker.ui.activity
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.Creator
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
 
+
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var themeInteractor: ThemeInteractor
+    private lateinit var binding: ActivitySettingsBinding
     private val emailService = Creator.provideEmailService()
     private val shareService = Creator.provideShareService()
     private val userAgreementService = Creator.provideUserAgreementService()
-    private val themeInteractor: ThemeInteractor = Creator.themeInteractor
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { v, insets ->
+        themeInteractor = Creator.provideThemeInteractor(this)
+
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        enableEdgeToEdge()
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.settings) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        findViewById<ImageButton>(R.id.settings_btn_back).setOnClickListener { finish() }
+        binding.settingsBtnBack.setOnClickListener { finish() }
 
-        findViewById<ImageView>(R.id.agreement).setOnClickListener {
+        binding.agreement.setOnClickListener {
             userAgreementService.openUserAgreement(this, getString(R.string.agreement_text))
         }
-        findViewById<TextView>(R.id.agreementText).setOnClickListener {
+        binding.agreementText.setOnClickListener {
             userAgreementService.openUserAgreement(this, getString(R.string.agreement_text))
         }
 
-        findViewById<ImageView>(R.id.share).setOnClickListener {
+        binding.share.setOnClickListener {
             shareService.shareApp(this, getString(R.string.share_text))
         }
-        findViewById<TextView>(R.id.shareText).setOnClickListener {
+        binding.shareText.setOnClickListener {
             shareService.shareApp(this, getString(R.string.share_text))
         }
 
-        findViewById<ImageView>(R.id.support).setOnClickListener {
+        binding.support.setOnClickListener {
             sendEmail()
         }
-        findViewById<TextView>(R.id.supportText).setOnClickListener {
+        binding.supportText.setOnClickListener {
             sendEmail()
         }
 
@@ -66,9 +70,18 @@ class SettingsActivity : AppCompatActivity() {
 
         switch.setOnCheckedChangeListener { _, isChecked ->
             themeInteractor.setDarkMode(isChecked)
-            themeInteractor.applyTheme()
+            applyTheme()
             recreate()
         }
+    }
+
+    private fun applyTheme() {
+        val nightMode = if (themeInteractor.isDarkModeEnabled()) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode)
     }
 
     private fun sendEmail() {

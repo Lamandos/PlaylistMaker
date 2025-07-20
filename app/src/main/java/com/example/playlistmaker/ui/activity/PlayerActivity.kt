@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.activity
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,75 +24,75 @@ class PlayerActivity : AppCompatActivity() {
     private val viewModel: PlayerViewModel by viewModels {
         Creator.providePlayerViewModelFactory()
     }
-    private var currentTrack: TrackParcelable? = null
+
+    private lateinit var track: TrackParcelable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         enableEdgeToEdge()
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.player) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        currentTrack = intent.getParcelableExtra(TRACK_EXTRA) ?: run {
+        track = intent.getParcelableExtra(TRACK_EXTRA) ?: run {
             finish()
             return
         }
 
-        setupTrackInfo()
+        setupUI(track)
+        initObservers()
+        initListeners()
 
+        viewModel.preparePlayer(track.previewUrl)
+    }
 
+    private fun setupUI(track: TrackParcelable) = with(binding) {
+        trackTitle.text = track.trackName
+        artistName.text = track.artistName
+        valueDuration.text = formatTrackTime(track.trackTimeMillis)
+        valueYear.text = track.releaseDate?.take(4).orEmpty()
+        valueGenre.text = track.primaryGenreName
+        valueCountry.text = track.country
+        timer.text = formatTrackTime(0)
+
+        if (track.collectionName.isNullOrEmpty()) {
+            valueAlbum.visibility = android.view.View.GONE
+        } else {
+            valueAlbum.text = track.collectionName
+        }
+
+        Glide.with(this@PlayerActivity)
+            .load(ImageUtils.getCoverArtwork(track.artworkUrl100))
+            .placeholder(R.drawable.placeholder)
+            .transform(RoundedCorners(dpToPx(16)))
+            .into(albumCover)
+    }
+
+    private fun initObservers() {
         viewModel.playerState.observe(this) { state ->
-            when (state) {
-                is PlayerState.Playing -> binding.playButton.setImageResource(R.drawable.pause_btn)
-                is PlayerState.Prepared,
-                is PlayerState.Paused,
-                is PlayerState.Completed -> binding.playButton.setImageResource(R.drawable.play_btn)
-                else -> {}
-            }
+            binding.playButton.setImageResource(
+                when (state) {
+                    is PlayerState.Playing -> R.drawable.pause_btn
+                    else -> R.drawable.play_btn
+                }
+            )
         }
 
         viewModel.currentTime.observe(this) { time ->
             binding.timer.text = time
         }
-
-        initViews()
-
-        currentTrack?.previewUrl?.let { url -> viewModel.preparePlayer(url) }
     }
 
-    private fun initViews() {
-        binding.playButton.setOnClickListener {
+    private fun initListeners() = with(binding) {
+        playButton.setOnClickListener {
             viewModel.togglePlayback()
         }
-        binding.backButton.setOnClickListener { finish() }
-    }
-
-    private fun setupTrackInfo() {
-        currentTrack?.let { track ->
-            with(binding) {
-                trackTitle.text = track.trackName
-                artistName.text = track.artistName
-                valueDuration.text = formatTrackTime(track.trackTimeMillis)
-                timer.text = formatTrackTime(0)
-
-                track.collectionName?.let { albumName ->
-                    valueAlbum.text = albumName
-                } ?: run { valueAlbum.visibility = View.GONE }
-
-                valueYear.text = track.releaseDate?.take(4).orEmpty()
-                valueGenre.text = track.primaryGenreName
-                valueCountry.text = track.country
-
-                Glide.with(this@PlayerActivity)
-                    .load(ImageUtils.getCoverArtwork(track.artworkUrl100) ?: R.drawable.placeholder)
-                    .placeholder(R.drawable.placeholder)
-                    .transform(RoundedCorners(dpToPx(16)))
-                    .into(albumCover)
-            }
+        backButton.setOnClickListener {
+            finish()
         }
     }
 

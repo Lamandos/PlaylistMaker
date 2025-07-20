@@ -5,17 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker.data.mapper.TrackMapper
 import com.example.playlistmaker.data.network.ITunesApi
-import com.example.playlistmaker.data.player.MediaPlayerController
+import com.example.playlistmaker.data.repository.PlayerRepositoryImpl
 import com.example.playlistmaker.data.repository.SearchHistory
+import com.example.playlistmaker.data.repository.ThemeRepositoryImpl
+import com.example.playlistmaker.domain.api.ThemeRepository
 import com.example.playlistmaker.data.repository.TrackRepositoryImpl
 import com.example.playlistmaker.domain.api.TrackRepository
-import com.example.playlistmaker.domain.interactor.PlayerInteractor
+import com.example.playlistmaker.domain.interactor.PlayerInteractorImpl
 import com.example.playlistmaker.domain.interactor.SearchHistoryInteractor
 import com.example.playlistmaker.domain.interactor.SearchTracksInteractor
 import com.example.playlistmaker.domain.interactor.ThemeInteractor
-import com.example.playlistmaker.presentation.TrackParcelable
 import com.example.playlistmaker.presentation.viewmodel.PlayerViewModel
-import com.example.playlistmaker.ui.activity.TrackAdapter
 import com.example.playlistmaker.ui.di.App
 import com.example.playlistmaker.ui.utils.ShareService
 import com.example.playlistmaker.utils.EmailService
@@ -41,10 +41,6 @@ object Creator {
         retrofit.create(ITunesApi::class.java)
     }
 
-    val playerInteractor: PlayerInteractor by lazy {
-        MediaPlayerController()
-    }
-
     private val trackMapper: TrackMapper by lazy {
         TrackMapper()
     }
@@ -56,22 +52,12 @@ object Creator {
     val searchTracksInteractor: SearchTracksInteractor by lazy {
         SearchTracksInteractor(trackRepository)
     }
-
-    private var historyInteractor: SearchHistoryInteractor? = null
-
-    fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {
-        if (historyInteractor == null) {
-            val sharedPreferences = context.getSharedPreferences("playlist_prefs", Context.MODE_PRIVATE)
-            val repository = SearchHistory(sharedPreferences)
-            historyInteractor = SearchHistoryInteractor(repository)
-        }
-        return historyInteractor!!
+    private val searchHistoryRepository: SearchHistory by lazy {
+        SearchHistory(prefs)
     }
-
-    fun provideTrackAdapter(onClick: (TrackParcelable) -> Unit): TrackAdapter {
-        return TrackAdapter(mutableListOf(), onClick)
+    val searchHistoryInteractor: SearchHistoryInteractor by lazy {
+        SearchHistoryInteractor(searchHistoryRepository)
     }
-
     private val shareService: ShareService by lazy { ShareService() }
     fun provideShareService(): ShareService = shareService
 
@@ -81,24 +67,23 @@ object Creator {
     private val prefs by lazy {
         App.applicationContext().getSharedPreferences("app_settings", Context.MODE_PRIVATE)
     }
-
-    val themeInteractor by lazy {
-        ThemeInteractor(prefs)
-    }
-
     private val emailService by lazy { EmailService() }
     fun provideEmailService(): EmailService = emailService
 
     fun providePlayerViewModelFactory(): ViewModelProvider.Factory {
         return object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(PlayerViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return PlayerViewModel(playerInteractor) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
+                val repository = PlayerRepositoryImpl()
+                val interactor = PlayerInteractorImpl(repository)
+                return PlayerViewModel(interactor) as T
             }
         }
+    }
+    fun provideThemeInteractor(context: Context): ThemeInteractor {
+        val sharedPrefs = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val repository = ThemeRepositoryImpl(sharedPrefs)
+        return ThemeInteractor(repository)
     }
 }
 
