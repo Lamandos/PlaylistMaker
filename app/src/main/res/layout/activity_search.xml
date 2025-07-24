@@ -5,7 +5,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:id="@+id/search"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-tools:context=".ui.activity.SearchActivity"
+tools:context=".search.ui.activity.SearchActivity"
 android:orientation="vertical">
 
 <LinearLayout

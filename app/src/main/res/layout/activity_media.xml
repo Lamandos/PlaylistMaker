@@ -5,6 +5,6 @@
     android:id="@+id/media"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.MediaActivity">
+    tools:context=".MediaActivity">
 
 </androidx.constraintlayout.widget.ConstraintLayout>
