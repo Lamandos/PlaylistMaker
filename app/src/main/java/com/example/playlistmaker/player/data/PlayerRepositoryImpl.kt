@@ -3,9 +3,11 @@ package com.example.playlistmaker.player.data
 import com.example.playlistmaker.player.data.MediaPlayerController
 import com.example.playlistmaker.player.domain.PlayerRepository
 
-class PlayerRepositoryImpl : PlayerRepository {
+class PlayerRepositoryImpl(
+    private val mediaPlayerController: MediaPlayerController
+) : PlayerRepository {
 
-    private val mediaPlayerController = MediaPlayerController()
+
 
     override fun prepare(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit) {
         mediaPlayerController.prepare(url, onPrepared, onCompletion)

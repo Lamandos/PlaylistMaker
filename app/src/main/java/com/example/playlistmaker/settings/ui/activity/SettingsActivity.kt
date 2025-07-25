@@ -2,26 +2,19 @@ package com.example.playlistmaker.settings.ui.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.example.playlistmaker.sharing.domain.model.SharingInteractor
 import com.example.playlistmaker.settings.ui.viewmodel.SettingsViewModel
-import com.example.playlistmaker.sharing.domain.model.createSupportEmail
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private val sharingInteractor: SharingInteractor = Creator.provideSharingInteractor()
-
-    private val settingsViewModel: SettingsViewModel by viewModels {
-        Creator.provideSettingsViewModelFactory(this)
-    }
+    private val settingsViewModel: SettingsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,27 +43,27 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.agreement.setOnClickListener {
-            sharingInteractor.openTerms(this, getString(R.string.agreement_text))
+            settingsViewModel.openTerms(this)
         }
 
         binding.agreementText.setOnClickListener {
-            sharingInteractor.openTerms(this, getString(R.string.agreement_text))
+            settingsViewModel.openTerms(this)
         }
 
         binding.share.setOnClickListener {
-            sharingInteractor.shareApp(this, getString(R.string.share_text))
+            settingsViewModel.shareApp(this)
         }
 
         binding.shareText.setOnClickListener {
-            sharingInteractor.shareApp(this, getString(R.string.share_text))
+            settingsViewModel.shareApp(this)
         }
 
         binding.support.setOnClickListener {
-            sharingInteractor.openSupport(this@SettingsActivity, createSupportEmail())
+            settingsViewModel.openSupport(this)
         }
 
         binding.supportText.setOnClickListener {
-            sharingInteractor.openSupport(this@SettingsActivity, createSupportEmail())
+            settingsViewModel.openSupport(this)
         }
     }
 

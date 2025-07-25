@@ -3,15 +3,35 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.creator.Creator
-
+import com.example.playlistmaker.player.di.dataModulePlayer
+import com.example.playlistmaker.player.di.domainModulePlayer
+import com.example.playlistmaker.player.di.uiModulePlayer
+import com.example.playlistmaker.search.di.dataModuleSearch
+import com.example.playlistmaker.search.di.domainModuleSearch
+import com.example.playlistmaker.search.di.networkModule
+import com.example.playlistmaker.search.di.uiModuleSearch
+import com.example.playlistmaker.settings.di.dataModuleSettings
+import com.example.playlistmaker.settings.di.domainModuleSettings
+import com.example.playlistmaker.settings.di.sharingModule
+import com.example.playlistmaker.settings.di.uiModuleSettings
+import com.example.playlistmaker.settings.domain.SettingsInteractor
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
         instance = this
-        Creator.init(this)
-        val themeInteractor = Creator.provideThemeInteractor(this)
+
+        startKoin {
+            androidContext(this@App)
+            modules(dataModulePlayer, domainModulePlayer, uiModulePlayer,
+                dataModuleSettings, domainModuleSettings, uiModuleSettings, sharingModule,
+                networkModule, dataModuleSearch, domainModuleSearch, uiModuleSearch)
+        }
+
+        val themeInteractor: SettingsInteractor by inject()
 
         if (themeInteractor.hasUserSetTheme()) {
             val isDark = themeInteractor.isDarkModeEnabled()
