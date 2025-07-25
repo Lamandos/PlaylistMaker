@@ -5,9 +5,10 @@ import com.example.playlistmaker.search.domain.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class SearchHistoryRepository(private val sharedPreferences: SharedPreferences) {
-
-    private val gson = Gson()
+class SearchHistoryRepository(
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson
+) {
     private val key = "search_history"
     private val maxHistorySize = 10
 

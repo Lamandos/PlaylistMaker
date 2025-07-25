@@ -6,6 +6,6 @@ import com.example.playlistmaker.player.domain.PlayerRepository
 import org.koin.dsl.module
 
 val dataModulePlayer = module {
-    single { MediaPlayerController() }
+    factory { MediaPlayerController() }
     single<PlayerRepository> { PlayerRepositoryImpl(get()) }
 }

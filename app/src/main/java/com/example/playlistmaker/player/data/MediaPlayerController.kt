@@ -3,9 +3,10 @@ package com.example.playlistmaker.player.data
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 
-class MediaPlayerController {
-
+class MediaPlayerController(
     private var mediaPlayer: MediaPlayer? = null
+) {
+
     private var isPrepared = false
 
     fun prepare(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit) {

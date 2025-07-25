@@ -32,17 +32,15 @@ import com.example.playlistmaker.search.ui.view_model.SearchScreenState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class SearchActivity : AppCompatActivity() {
     private val searchViewModel: SearchViewModel by viewModel()
-    private val trackAdapter: TrackAdapter by lazy {
-        get<TrackAdapter>(parameters = { parametersOf(::handleTrackClick) })
+    private val trackAdapter = TrackAdapter(mutableListOf()) { track ->
+        handleTrackClick(track)
     }
-    private val historyAdapter: TrackAdapter by lazy {
-        get<TrackAdapter>(parameters = { parametersOf(::handleTrackClick) })
+    private val historyAdapter = TrackAdapter(mutableListOf()) { track ->
+        handleTrackClick(track)
     }
     private lateinit var queryInput: EditText
     private lateinit var clearButton: ImageView
