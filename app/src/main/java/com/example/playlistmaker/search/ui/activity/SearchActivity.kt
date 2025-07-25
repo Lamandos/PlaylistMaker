@@ -17,14 +17,12 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.player.ui.activity.PlayerActivity
 import com.example.playlistmaker.search.ui.TrackParcelable
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
@@ -34,25 +32,18 @@ import com.example.playlistmaker.search.ui.view_model.SearchScreenState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchActivity : AppCompatActivity() {
-
-    private val searchViewModel: SearchViewModel by viewModels(
-        factoryProducer = { Creator.provideSearchViewModelFactory() }
-    )
-
-    private val trackAdapter by lazy {
-        TrackAdapter(mutableListOf()) { track ->
-            addToHistoryAndNavigate(track)
-        }
+    private val searchViewModel: SearchViewModel by viewModel()
+    private val trackAdapter: TrackAdapter by lazy {
+        get<TrackAdapter>(parameters = { parametersOf(::handleTrackClick) })
     }
-
-    private val historyAdapter by lazy {
-        TrackAdapter(mutableListOf()) { track ->
-            addToHistoryAndNavigate(track)
-        }
+    private val historyAdapter: TrackAdapter by lazy {
+        get<TrackAdapter>(parameters = { parametersOf(::handleTrackClick) })
     }
-
     private lateinit var queryInput: EditText
     private lateinit var clearButton: ImageView
     private lateinit var noResultsLayout: LinearLayout
@@ -78,6 +69,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         initViews()
         setupRecyclerViews()
         setupClickListeners()
@@ -232,7 +224,9 @@ class SearchActivity : AppCompatActivity() {
             historyAdapter.updateTracks(historyList)
         }
     }
-
+    private fun handleTrackClick(track: TrackParcelable) {
+        addToHistoryAndNavigate(track)
+    }
     private fun addToHistoryAndNavigate(track: TrackParcelable) {
         searchViewModel.addToSearchHistory(track.toDomain())
         navigateToPlayer(track)
