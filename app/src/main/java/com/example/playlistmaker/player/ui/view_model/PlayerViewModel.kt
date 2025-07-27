@@ -5,10 +5,9 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.player.PlayerState
+import com.example.playlistmaker.player.domain.PlayerInteractor
 import com.example.playlistmaker.utils.formatTrackTime
-
 
 data class PlayerScreenState(
     val playerState: PlayerState = PlayerState.Default,
@@ -20,6 +19,7 @@ data class PlayerScreenState(
 class PlayerViewModel(
     private val interactor: PlayerInteractor
 ) : ViewModel() {
+
     private var currentUrl: String = ""
     private val handler = Handler(Looper.getMainLooper())
 
@@ -47,7 +47,6 @@ class PlayerViewModel(
             playerState = PlayerState.Preparing,
             trackTitle = title,
             trackArtist = artist
-
         )
 
         interactor.prepare(
@@ -63,6 +62,7 @@ class PlayerViewModel(
                 )
             },
             onCompletion = {
+                playbackPosition = 0
                 _screenState.postValue(
                     _screenState.value?.copy(
                         playerState = PlayerState.Completed,
@@ -87,6 +87,7 @@ class PlayerViewModel(
             else -> {}
         }
     }
+
     private fun play() {
         if (interactor.isPlaying()) return
 
@@ -97,6 +98,7 @@ class PlayerViewModel(
         )
         startProgressUpdates()
     }
+
     fun pause() {
         playbackPosition = interactor.currentPosition()
         interactor.pause()
@@ -105,13 +107,16 @@ class PlayerViewModel(
         }
         stopProgressUpdates()
     }
+
     fun release() {
         stopProgressUpdates()
         interactor.release()
     }
+
     private fun startProgressUpdates() {
         handler.post(progressRunnable)
     }
+
     private fun stopProgressUpdates() {
         handler.removeCallbacks(progressRunnable)
     }
