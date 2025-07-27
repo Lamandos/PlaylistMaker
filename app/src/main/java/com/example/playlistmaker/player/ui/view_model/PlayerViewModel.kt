@@ -62,6 +62,7 @@ class PlayerViewModel(
                 )
             },
             onCompletion = {
+                playbackPosition = 0
                 _screenState.postValue(
                     _screenState.value?.copy(
                         playerState = PlayerState.Completed,

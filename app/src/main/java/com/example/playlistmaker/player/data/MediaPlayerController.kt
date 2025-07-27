@@ -1,36 +1,26 @@
 package com.example.playlistmaker.player.data
 
-import android.media.AudioAttributes
 import android.media.MediaPlayer
 
 class MediaPlayerController(
-    private var mediaPlayer: MediaPlayer? = null
+    private val mediaPlayerProvider: () -> MediaPlayer
 ) {
-
+    private var mediaPlayer: MediaPlayer? = null
     private var isPrepared = false
 
     fun prepare(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit) {
         release()
 
-        mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
+        mediaPlayer = mediaPlayerProvider().apply {
             setDataSource(url)
-
             setOnPreparedListener {
                 isPrepared = true
                 onPrepared()
             }
-
             setOnCompletionListener {
                 isPrepared = false
                 onCompletion()
             }
-
             prepareAsync()
         }
     }
@@ -40,7 +30,9 @@ class MediaPlayerController(
     }
 
     fun pause() {
-        if (isPrepared && mediaPlayer?.isPlaying == true) mediaPlayer?.pause()
+        if (isPrepared && mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+        }
     }
 
     fun release() {
