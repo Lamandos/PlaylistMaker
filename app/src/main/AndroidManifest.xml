@@ -18,7 +18,7 @@
             android:theme="@style/Theme.SearchScreen"
             android:exported="true" />
         <activity
-            android:name=".MediaActivity"
+            android:name=".media.ui.activity.MediaActivity"
             android:exported="false" />
         <activity
             android:name=".player.ui.activity.PlayerActivity"
