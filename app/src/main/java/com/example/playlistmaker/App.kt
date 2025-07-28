@@ -3,6 +3,7 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.media.di.uiModuleMedia
 import com.example.playlistmaker.player.di.dataModulePlayer
 import com.example.playlistmaker.player.di.domainModulePlayer
 import com.example.playlistmaker.player.di.uiModulePlayer
@@ -28,7 +29,7 @@ class App : Application() {
             androidContext(this@App)
             modules(dataModulePlayer, domainModulePlayer, uiModulePlayer,
                 dataModuleSettings, domainModuleSettings, uiModuleSettings, sharingModule,
-                networkModule, dataModuleSearch, domainModuleSearch, uiModuleSearch)
+                networkModule, dataModuleSearch, domainModuleSearch, uiModuleSearch, uiModuleMedia)
         }
 
         val themeInteractor: SettingsInteractor by inject()
