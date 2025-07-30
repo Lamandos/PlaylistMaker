@@ -1,29 +1,26 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.player.ui.activity.PlayerActivity
 import com.example.playlistmaker.search.ui.TrackParcelable
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import com.example.playlistmaker.TrackAdapter
@@ -33,8 +30,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.navigation.NavController
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
+
     private val searchViewModel: SearchViewModel by viewModel()
     private val trackAdapter = TrackAdapter(mutableListOf()) { track ->
         handleTrackClick(track)
@@ -42,6 +41,7 @@ class SearchActivity : AppCompatActivity() {
     private val historyAdapter = TrackAdapter(mutableListOf()) { track ->
         handleTrackClick(track)
     }
+
     private lateinit var queryInput: EditText
     private lateinit var clearButton: ImageView
     private lateinit var noResultsLayout: LinearLayout
@@ -51,62 +51,94 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var historyLayout: LinearLayout
     private lateinit var historyTitle: TextView
     private lateinit var clearHistoryButton: Button
-    private lateinit var backButton: ImageButton
     private lateinit var refreshButton: Button
 
     private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay = 3000L
     private val uiScope = CoroutineScope(Dispatchers.Main)
+    private var isComingFromNavigation = false
+    private var lastNavigationTime = 0L
+    private val navigationListener = NavController.OnDestinationChangedListener { _, destination, _ ->
+        isComingFromNavigation = destination.id != R.id.searchFragment
+        lastNavigationTime = System.currentTimeMillis()
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
-        enableEdgeToEdge()
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_search, container, false)
+    }
 
-        initViews()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        findNavController().addOnDestinationChangedListener(navigationListener)
+        initViews(view)
         setupRecyclerViews()
         setupClickListeners()
         setupSearchField()
         observeViewModel()
+        hideSearchHistory()
+        val savedQuery = searchViewModel.getCurrentQuery()
+        if (savedQuery.isNotEmpty()) {
+            queryInput.setText(savedQuery)
+            updateClearButtonVisibility(savedQuery)
+            performSearch(savedQuery)
+        }
     }
 
-    private fun initViews() {
-        queryInput = findViewById(R.id.search_field)
-        clearButton = findViewById(R.id.clear_icon)
-        noResultsLayout = findViewById(R.id.no_results)
-        networkErrorLayout = findViewById(R.id.network_error)
-        progressBar = findViewById(R.id.progressBar)
-        historyRecyclerView = findViewById(R.id.recycler_view_history)
-        historyLayout = findViewById(R.id.history_list)
-        historyTitle = findViewById(R.id.history)
-        clearHistoryButton = findViewById(R.id.clear_history_btn)
-        backButton = findViewById(R.id.search_btn_back)
-        refreshButton = findViewById(R.id.refresh_btn)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        findNavController().removeOnDestinationChangedListener(navigationListener)
+        handler.removeCallbacksAndMessages(null)
+        searchViewModel.screenState.removeObservers(viewLifecycleOwner)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacksAndMessages(null)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isComingFromNavigation = false
+        updateClearButtonVisibility(queryInput.text.toString())
+    }
+
+    private fun initViews(view: View) {
+        queryInput = view.findViewById(R.id.search_field)
+        clearButton = view.findViewById(R.id.clear_icon)
+        noResultsLayout = view.findViewById(R.id.no_results)
+        networkErrorLayout = view.findViewById(R.id.network_error)
+        progressBar = view.findViewById(R.id.progressBar)
+        historyRecyclerView = view.findViewById(R.id.recycler_view_history)
+        historyLayout = view.findViewById(R.id.history_list)
+        historyTitle = view.findViewById(R.id.history)
+        clearHistoryButton = view.findViewById(R.id.clear_history_btn)
+        refreshButton = view.findViewById(R.id.refresh_btn)
     }
 
     private fun setupRecyclerViews() {
-        findViewById<RecyclerView>(R.id.recycler_view).apply {
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+        requireView().findViewById<RecyclerView>(R.id.recycler_view).apply {
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = trackAdapter
         }
 
         historyRecyclerView.apply {
-            layoutManager = LinearLayoutManager(this@SearchActivity)
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = historyAdapter
         }
     }
+
     private fun setupClickListeners() {
-        backButton.setOnClickListener { onBackPressed() }
         clearHistoryButton.setOnClickListener {
             hideSearchHistory()
             searchViewModel.clearSearchHistory()
             showSearchHistoryAsync()
         }
+
         clearButton.setOnClickListener {
             queryInput.text.clear()
             searchViewModel.clearSearchResults()
@@ -114,6 +146,7 @@ class SearchActivity : AppCompatActivity() {
             hideKeyboard()
             showSearchHistoryAsync()
         }
+
         refreshButton.setOnClickListener {
             val currentQuery = queryInput.text.toString().trim()
             if (currentQuery.isNotEmpty()) {
@@ -145,9 +178,12 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val currentText = s?.toString() ?: ""
-                clearButton.visibility = if (currentText.isEmpty()) View.GONE else View.VISIBLE
+                if (isComingFromNavigation || System.currentTimeMillis() - lastNavigationTime < 300) {
+                    return
+                }
 
+                val currentText = s?.toString() ?: ""
+                updateClearButtonVisibility(currentText)
                 handler.removeCallbacksAndMessages(null)
 
                 if (currentText.isEmpty()) {
@@ -157,7 +193,7 @@ class SearchActivity : AppCompatActivity() {
 
                 lastText = currentText
                 handler.postDelayed({
-                    if (lastText == currentText) {
+                    if (!isComingFromNavigation && lastText == currentText) {
                         performSearch(currentText.trim())
                     }
                 }, debounceDelay)
@@ -166,9 +202,11 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
     }
-
+    private fun updateClearButtonVisibility(text: String) {
+        clearButton.visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
+    }
     private fun performSearch(query: String) {
-        if (query.isEmpty()) {
+        if (query.isEmpty() || isComingFromNavigation) {
             showSearchHistoryAsync()
             return
         }
@@ -202,7 +240,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        searchViewModel.screenState.observe(this) { state ->
+        searchViewModel.screenState.observe(viewLifecycleOwner) { state ->
             handleScreenState(state)
         }
     }
@@ -222,30 +260,28 @@ class SearchActivity : AppCompatActivity() {
             historyAdapter.updateTracks(historyList)
         }
     }
+
     private fun handleTrackClick(track: TrackParcelable) {
         addToHistoryAndNavigate(track)
     }
+
     private fun addToHistoryAndNavigate(track: TrackParcelable) {
         searchViewModel.addToSearchHistory(track.toDomain())
         navigateToPlayer(track)
     }
 
     private fun navigateToPlayer(track: TrackParcelable) {
-        startActivity(Intent(this, PlayerActivity::class.java).apply {
-            putExtra("track", track)
-        })
+        isComingFromNavigation = true
+        val direction = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
+        findNavController().navigate(direction)
     }
 
     private fun hideKeyboard() {
-        (getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager)?.let { imm ->
-            imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
-        }
+        val imm = requireContext().getSystemService(InputMethodManager::class.java)
+        imm.hideSoftInputFromWindow(queryInput.windowToken, 0)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
-        searchViewModel.screenState.removeObservers(this)
+    companion object {
+        fun newInstance() = SearchFragment()
     }
 }
-

@@ -2,15 +2,6 @@
     <style name="Theme.MainScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/yp_black</item>
     </style>
-    <style name="Theme.SettingsScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/yp_black</item>
-    </style>
-    <style name="Theme.SearchScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/yp_black</item>
-    </style>
-    <style name="Theme.PlayerScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/yp_black</item>
-    </style>
     <style name="Theme.SettingsBtnBack" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="tint">@color/white</item>
     </style>

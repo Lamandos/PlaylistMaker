@@ -1,15 +1,14 @@
-package com.example.playlistmaker.player.ui.activity
+package com.example.playlistmaker.player.ui.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.ui.view_model.PlayerViewModel
 import com.example.playlistmaker.search.ui.TrackParcelable
 import com.example.playlistmaker.player.PlayerState
@@ -17,34 +16,46 @@ import com.example.playlistmaker.utils.dpToPx
 import com.example.playlistmaker.utils.formatTrackTime
 import com.example.playlistmaker.utils.view.ImageUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
 
-class PlayerActivity : AppCompatActivity() {
+class PlayerFragment : Fragment() {
 
-    private lateinit var binding: ActivityPlayerBinding
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: PlayerViewModel by viewModel()
 
     private lateinit var track: TrackParcelable
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        enableEdgeToEdge()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.player) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        track = intent.getParcelableExtra(TRACK_EXTRA) ?: run {
-            finish()
+        track = arguments?.getParcelable(TRACK_EXTRA) ?: run {
+            findNavController().popBackStack()
             return
         }
 
         setupUI(track)
         initObservers()
         initListeners()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().popBackStack()
+                }
+            }
+        )
 
         viewModel.preparePlayer(track.previewUrl, track.trackName, track.artistName)
     }
@@ -56,7 +67,7 @@ class PlayerActivity : AppCompatActivity() {
         valueYear.text = track.releaseDate?.take(4).orEmpty()
         valueGenre.text = track.primaryGenreName
         valueCountry.text = track.country
-        binding.playButton.isEnabled = true
+        playButton.isEnabled = true
         timer.text = formatTrackTime(0)
 
         if (track.collectionName.isNullOrEmpty()) {
@@ -65,15 +76,15 @@ class PlayerActivity : AppCompatActivity() {
             valueAlbum.text = track.collectionName
         }
 
-        Glide.with(this@PlayerActivity)
+        Glide.with(this@PlayerFragment)
             .load(ImageUtils.getCoverArtwork(track.artworkUrl100))
             .placeholder(R.drawable.placeholder)
-            .transform(RoundedCorners(dpToPx(16)))
+            .transform(RoundedCorners(requireContext().dpToPx(16)))
             .into(albumCover)
     }
 
     private fun initObservers() {
-        viewModel.screenState.observe(this) { state ->
+        viewModel.screenState.observe(viewLifecycleOwner) { state ->
             state?.let {
                 binding.playButton.setImageResource(
                     when (state.playerState) {
@@ -91,7 +102,7 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.togglePlayback()
         }
         backButton.setOnClickListener {
-            finish()
+            findNavController().popBackStack()
         }
     }
 
@@ -100,12 +111,21 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.pause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         viewModel.release()
+        _binding = null
     }
 
     companion object {
         const val TRACK_EXTRA = "track"
+
+        fun newInstance(track: TrackParcelable): PlayerFragment {
+            return PlayerFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(TRACK_EXTRA, track)
+                }
+            }
+        }
     }
 }

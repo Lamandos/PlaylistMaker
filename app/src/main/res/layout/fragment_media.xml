@@ -6,32 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".media.ui.activity.MediaActivity">
+    tools:context="com.example.playlistmaker.media.ui.fragment.MediaFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/media_btn_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start"
-            android:background="@android:color/transparent"
-            android:src="@drawable/back_icon"
-            android:theme="@style/Theme.SettingsBtnBack"
-            style="@style/settings_btn_back_style"
-            android:layout_marginTop="@dimen/bk_button_merg"
-            android:layout_marginStart="@dimen/bk_button_merg"
-            android:layout_marginBottom="@dimen/bk_button_merg"
-            />
-
         <TextView
             style="@style/settings_theme_header"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_gravity="center_vertical|start"
-            android:paddingStart="12dp"
+            android:paddingStart="16dp"
+            android:gravity="center"
             android:text="@string/media_name"
             android:textColorLink="@color/blue" />
     </LinearLayout>
