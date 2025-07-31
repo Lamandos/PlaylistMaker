@@ -5,7 +5,7 @@
     android:id="@+id/track"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".search.ui.activity.SearchActivity"
+    tools:context=".search.ui.fragments.SearchFragment"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id ("kotlin-parcelize")
+    id ("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -41,6 +42,9 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.5.3")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation ("androidx.fragment:fragment-ktx:1.5.5")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
     implementation ("io.insert-koin:koin-android:3.3.0")

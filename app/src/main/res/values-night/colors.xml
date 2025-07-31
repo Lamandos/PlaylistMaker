@@ -7,8 +7,8 @@
     <color name="yp_gray">#AEAFB4</color>
     <color name="yp_light_gray">#E6E8EB</color>
     <color name="bottom_nav_icon_active">@color/blue</color>
-    <color name="bottom_nav_icon_inactive">@color/yp_black</color>
+    <color name="bottom_nav_icon_inactive">@color/white</color>
     <color name="bottom_nav_text_active">@color/blue</color>
-    <color name="bottom_nav_text_inactive">@color/yp_black</color>
-    <color name="bottom_nav_background">@color/white</color>
+    <color name="bottom_nav_text_inactive">@color/white</color>
+    <color name="bottom_nav_background">@color/yp_black</color>
 </resources>

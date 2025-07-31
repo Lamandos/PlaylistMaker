@@ -1,70 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".main.ui.activity.MainActivity"
-    android:padding="0dp">
-
-    <FrameLayout
+    android:orientation="vertical">
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:text="@string/title"
-            style="@style/menu_theme_header"
-            android:paddingTop="14dp"
-            android:paddingStart="16dp"
-            android:paddingBottom="16dp"/>
-
-    </FrameLayout>
-
-    <LinearLayout
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingTop="24dp"
-        android:paddingBottom="28dp">
+        android:layout_height="0.5dp"
+        android:layout_gravity="bottom"
+        android:background="@color/yp_light_gray" />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        style="@style/BottomNavTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled" />
 
-        <Button
-            android:id="@+id/search_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/margin_def"
-            android:layout_marginStart="@dimen/margin_def"
-            android:layout_marginBottom="@dimen/margin_half"
-            android:text="@string/search_btn_text"
-            style="@style/menu_theme"
-            app:icon="@drawable/search_icon" />
-
-
-        <Button
-            android:id="@+id/media_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/margin_def"
-            android:layout_marginStart="@dimen/margin_def"
-            android:layout_marginTop="@dimen/margin_half"
-            android:layout_marginBottom="@dimen/margin_half"
-            android:text="@string/media_btn_text"
-            style="@style/menu_theme"
-            app:icon="@drawable/media_icon" />
-
-        <Button
-            android:id="@+id/settings_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/margin_def"
-            android:layout_marginTop="@dimen/margin_half"
-            android:layout_marginEnd="@dimen/margin_def"
-            android:text="@string/options_btn_text"
-            style="@style/menu_theme"
-            app:icon="@drawable/options_icon" />
-    </LinearLayout>
 </LinearLayout>

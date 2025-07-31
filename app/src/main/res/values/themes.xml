@@ -1,14 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.MainScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/blue</item>
-    </style>
-    <style name="Theme.SettingsScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/white</item>
-    </style>
-    <style name="Theme.SearchScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/white</item>
-    </style>
-    <style name="Theme.PlayerScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
     </style>
     <style name="Theme.SettingsBtnBack" parent="Theme.MaterialComponents.DayNight.NoActionBar">

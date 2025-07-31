@@ -20,7 +20,15 @@ class SearchViewModel(
     val screenState: LiveData<SearchScreenState> = _screenState
 
     private var currentSearchResults: List<TrackParcelable> = emptyList()
+    private var currentQuery: String = ""
 
+    fun setCurrentQuery(query: String) {
+        currentQuery = query
+    }
+
+    fun getCurrentQuery(): String {
+        return currentQuery
+    }
     fun searchTracks(query: String) {
         when {
             query.isEmpty() -> {

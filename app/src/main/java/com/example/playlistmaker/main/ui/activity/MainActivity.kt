@@ -1,48 +1,57 @@
 package com.example.playlistmaker.main.ui.activity
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.playlistmaker.media.ui.activity.MediaActivity
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.example.playlistmaker.R
-import com.example.playlistmaker.search.ui.activity.SearchActivity
-import com.example.playlistmaker.settings.ui.activity.SettingsActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
+    private lateinit var navController: NavController
+    private lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
-        val srchButton = findViewById<Button>(R.id.search_btn)
+        bottomNavigationView = findViewById(R.id.bottom_nav)
 
-        srchButton.setOnClickListener {
-            val searchIntent = Intent(this, SearchActivity::class.java)
-            startActivity(searchIntent)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        findViewById<BottomNavigationView>(R.id.bottom_nav)?.let {
+            NavigationUI.setupWithNavController(it, navController)
+            it.itemBackground = ContextCompat.getDrawable(this, android.R.color.transparent)
         }
+        NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
-        val mediaBtn = findViewById<Button>(R.id.media_btn)
-
-        mediaBtn.setOnClickListener {
-            val mediaIntent = Intent(this, MediaActivity::class.java)
-            startActivity(mediaIntent)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.playerFragment) {
+                hideBottomNavigationView()
+            } else {
+                showBottomNavigationView()
+            }
         }
+    }
+    private fun hideBottomNavigationView() {
+        bottomNavigationView.visibility = View.GONE
+    }
 
-        val settingsBtn = findViewById<Button>(R.id.settings_btn)
-
-        settingsBtn.setOnClickListener {
-            val settingsIntent = Intent(this, SettingsActivity::class.java)
-            startActivity(settingsIntent)
-        }
+    private fun showBottomNavigationView() {
+        bottomNavigationView.visibility = View.VISIBLE
     }
 }
