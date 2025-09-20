@@ -1,13 +1,12 @@
 package com.example.playlistmaker.player.ui.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.PlayerState
 import com.example.playlistmaker.player.domain.PlayerInteractor
-import com.example.playlistmaker.utils.formatTrackTime
+import kotlinx.coroutines.launch
 
 data class PlayerScreenState(
     val playerState: PlayerState = PlayerState.Default,
@@ -20,104 +19,66 @@ class PlayerViewModel(
     private val interactor: PlayerInteractor
 ) : ViewModel() {
 
-    private var currentUrl: String = ""
-    private val handler = Handler(Looper.getMainLooper())
-
     private val _screenState = MutableLiveData<PlayerScreenState>()
     val screenState: LiveData<PlayerScreenState> = _screenState
 
-    private var playbackPosition = 0
+    private var currentUrl: String = ""
 
-    private val progressRunnable = object : Runnable {
-        override fun run() {
-            if (interactor.isPlaying()) {
-                _screenState.value?.let {
-                    _screenState.postValue(
-                        it.copy(currentTime = formatTrackTime(interactor.currentPosition().toLong()))
+    fun preparePlayer(url: String, title: String, artist: String) {
+        currentUrl = url
+
+        viewModelScope.launch {
+            interactor.prepare(url).collect { state ->
+                _screenState.postValue(
+                    PlayerScreenState(
+                        playerState = state,
+                        trackTitle = title,
+                        trackArtist = artist,
+                        currentTime = if (state == PlayerState.Completed) "00:00" else "00:00"
                     )
-                }
-                handler.postDelayed(this, 300L)
+                )
+            }
+        }
+
+        viewModelScope.launch {
+            interactor.observeProgress().collect { time ->
+                _screenState.postValue(_screenState.value?.copy(currentTime = time))
+            }
+        }
+
+        viewModelScope.launch {
+            interactor.observeCompletion().collect {
+                _screenState.postValue(
+                    _screenState.value?.copy(playerState = PlayerState.Completed, currentTime = "00:00")
+                )
             }
         }
     }
 
-    fun preparePlayer(url: String, title: String, artist: String) {
-        currentUrl = url
-        _screenState.value = PlayerScreenState(
-            playerState = PlayerState.Preparing,
-            trackTitle = title,
-            trackArtist = artist
-        )
-
-        interactor.prepare(
-            url,
-            onPrepared = {
-                _screenState.postValue(
-                    PlayerScreenState(
-                        playerState = PlayerState.Prepared,
-                        trackTitle = title,
-                        trackArtist = artist,
-                        currentTime = "00:00"
-                    )
-                )
-            },
-            onCompletion = {
-                playbackPosition = 0
-                _screenState.postValue(
-                    _screenState.value?.copy(
-                        playerState = PlayerState.Completed,
-                        currentTime = "00:00"
-                    )
-                )
-                preparePlayer(currentUrl, title, artist)
-            }
-        )
-    }
-
     fun togglePlayback() {
-        when (screenState.value?.playerState) {
+        when (_screenState.value?.playerState) {
             PlayerState.Playing -> pause()
             PlayerState.Prepared, PlayerState.Paused -> play()
-            PlayerState.Completed -> {
-                preparePlayer(currentUrl,
-                    screenState.value?.trackTitle ?: "",
-                    screenState.value?.trackArtist ?: "")
-            }
-            PlayerState.Preparing -> {}
+            PlayerState.Completed -> preparePlayer(
+                currentUrl,
+                _screenState.value?.trackTitle ?: "",
+                _screenState.value?.trackArtist ?: ""
+            )
             else -> {}
         }
     }
 
-    private fun play() {
-        if (interactor.isPlaying()) return
-
-        interactor.seekTo(playbackPosition)
+    fun play() {
         interactor.play()
-        _screenState.postValue(
-            screenState.value!!.copy(playerState = PlayerState.Playing)
-        )
-        startProgressUpdates()
+        _screenState.postValue(_screenState.value?.copy(playerState = PlayerState.Playing))
     }
 
     fun pause() {
-        playbackPosition = interactor.currentPosition()
         interactor.pause()
-        _screenState.value?.let {
-            _screenState.postValue(it.copy(playerState = PlayerState.Paused))
-        }
-        stopProgressUpdates()
+        _screenState.postValue(_screenState.value?.copy(playerState = PlayerState.Paused))
     }
 
     fun release() {
-        stopProgressUpdates()
         interactor.release()
-    }
-
-    private fun startProgressUpdates() {
-        handler.post(progressRunnable)
-    }
-
-    private fun stopProgressUpdates() {
-        handler.removeCallbacks(progressRunnable)
     }
 }

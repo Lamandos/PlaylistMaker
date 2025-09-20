@@ -5,15 +5,14 @@ import com.example.playlistmaker.search.domain.model.Track
 
 class SearchHistoryInteractor(private val searchRepository: SearchHistoryRepository) {
 
-    fun addToSearchHistory(track: Track) {
+    suspend fun addToSearchHistory(track: Track) {
         searchRepository.addToSearchHistory(track)
     }
 
-    fun clearSearchHistory() {
+    suspend fun clearSearchHistory() {
         searchRepository.clearSearchHistory()
     }
-
-    fun getSearchHistory(): List<Track> {
+    suspend fun getSearchHistory(): List<Track> {
         return searchRepository.getSearchHistory()
     }
 }

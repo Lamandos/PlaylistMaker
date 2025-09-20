@@ -9,6 +9,7 @@ import com.example.playlistmaker.search.domain.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.domain.model.toParcelable
 import com.example.playlistmaker.search.ui.TrackParcelable
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -29,6 +30,7 @@ class SearchViewModel(
     fun getCurrentQuery(): String {
         return currentQuery
     }
+
     fun searchTracks(query: String) {
         when {
             query.isEmpty() -> {
@@ -48,36 +50,28 @@ class SearchViewModel(
                 )
 
                 viewModelScope.launch {
-                    try {
-                        searchTracksInteractor.searchTracks(query)
-                            .onSuccess { tracks ->
-                                currentSearchResults = tracks.map(Track::toParcelable)
-                                _screenState.value = SearchScreenState(
-                                    trackList = currentSearchResults,
-                                    showNoResults = tracks.isEmpty(),
-                                    userText = query,
-                                    historyList = getCurrentHistory()
-                                )
-                            }
-                            .onFailure {
-                                _screenState.value = SearchScreenState(
-                                    showNetworkError = true,
-                                    userText = query,
-                                    historyList = getCurrentHistory()
-                                )
-                            }
-                    } catch (e: Exception) {
-                        _screenState.value = SearchScreenState(
-                            showNetworkError = true,
-                            userText = query,
-                            historyList = getCurrentHistory()
-                        )
-                    }
+                    searchTracksInteractor.searchTracks(query)
+                        .catch { e ->
+                            _screenState.value = SearchScreenState(
+                                showNetworkError = true,
+                                userText = query,
+                                historyList = getCurrentHistory()
+                            )
+                        }
+                        .collect { tracks ->
+                            currentSearchResults = tracks.map { it.toParcelable() }
+
+                            _screenState.value = SearchScreenState(
+                                trackList = currentSearchResults,
+                                showNoResults = tracks.isEmpty(),
+                                userText = query,
+                                historyList = getCurrentHistory()
+                            )
+                        }
                 }
             }
         }
     }
-
 
     fun addToSearchHistory(track: Track) {
         viewModelScope.launch {
@@ -103,8 +97,8 @@ class SearchViewModel(
         }
     }
 
-    private fun updateHistoryState() {
-        val history = searchHistoryInteractor.getSearchHistory().map(Track::toParcelable)
+    private suspend fun updateHistoryState() {
+        val history = searchHistoryInteractor.getSearchHistory().map { it.toParcelable() }
         _screenState.value = _screenState.value?.copy(
             historyList = history,
             isFirstSearch = history.isEmpty(),
