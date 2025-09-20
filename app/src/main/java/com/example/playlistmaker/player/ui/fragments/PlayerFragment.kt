@@ -4,27 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
+import com.example.playlistmaker.player.PlayerState
+import com.example.playlistmaker.player.ui.view_model.PlayerScreenState
 import com.example.playlistmaker.player.ui.view_model.PlayerViewModel
 import com.example.playlistmaker.search.ui.TrackParcelable
-import com.example.playlistmaker.player.PlayerState
 import com.example.playlistmaker.utils.dpToPx
 import com.example.playlistmaker.utils.formatTrackTime
 import com.example.playlistmaker.utils.view.ImageUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.activity.OnBackPressedCallback
-import androidx.navigation.fragment.findNavController
 
 class PlayerFragment : Fragment() {
 
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PlayerViewModel by viewModel()
 
+    private val viewModel: PlayerViewModel by viewModel()
     private lateinit var track: TrackParcelable
 
     override fun onCreateView(
@@ -85,25 +86,23 @@ class PlayerFragment : Fragment() {
 
     private fun initObservers() {
         viewModel.screenState.observe(viewLifecycleOwner) { state ->
-            state?.let {
-                binding.playButton.setImageResource(
-                    when (state.playerState) {
-                        PlayerState.Playing -> R.drawable.pause_btn
-                        else -> R.drawable.play_btn
-                    }
-                )
-                binding.timer.text = state.currentTime
-            }
+            state?.let { renderState(it) }
         }
     }
 
+    private fun renderState(state: PlayerScreenState) = with(binding) {
+        playButton.setImageResource(
+            when (state.playerState) {
+                PlayerState.Playing -> R.drawable.pause_btn
+                else -> R.drawable.play_btn
+            }
+        )
+        timer.text = state.currentTime
+    }
+
     private fun initListeners() = with(binding) {
-        playButton.setOnClickListener {
-            viewModel.togglePlayback()
-        }
-        backButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
+        playButton.setOnClickListener { viewModel.togglePlayback() }
+        backButton.setOnClickListener { findNavController().popBackStack() }
     }
 
     override fun onPause() {

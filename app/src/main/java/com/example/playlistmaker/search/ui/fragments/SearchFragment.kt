@@ -1,8 +1,6 @@
 package com.example.playlistmaker.search.ui.fragments
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -17,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,11 +25,10 @@ import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import com.example.playlistmaker.TrackAdapter
 import com.example.playlistmaker.search.ui.toDomain
 import com.example.playlistmaker.search.ui.view_model.SearchScreenState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.navigation.NavController
 
 class SearchFragment : Fragment() {
 
@@ -53,15 +51,8 @@ class SearchFragment : Fragment() {
     private lateinit var clearHistoryButton: Button
     private lateinit var refreshButton: Button
 
-    private val handler = Handler(Looper.getMainLooper())
     private val debounceDelay = 3000L
-    private val uiScope = CoroutineScope(Dispatchers.Main)
-    private var isComingFromNavigation = false
-    private var lastNavigationTime = 0L
-    private val navigationListener = NavController.OnDestinationChangedListener { _, destination, _ ->
-        isComingFromNavigation = destination.id != R.id.searchFragment
-        lastNavigationTime = System.currentTimeMillis()
-    }
+    private var isUserTyping = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,37 +65,17 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findNavController().addOnDestinationChangedListener(navigationListener)
         initViews(view)
         setupRecyclerViews()
         setupClickListeners()
         setupSearchField()
         observeViewModel()
-        hideSearchHistory()
+
         val savedQuery = searchViewModel.getCurrentQuery()
         if (savedQuery.isNotEmpty()) {
             queryInput.setText(savedQuery)
             updateClearButtonVisibility(savedQuery)
-            performSearch(savedQuery)
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        findNavController().removeOnDestinationChangedListener(navigationListener)
-        handler.removeCallbacksAndMessages(null)
-        searchViewModel.screenState.removeObservers(viewLifecycleOwner)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        handler.removeCallbacksAndMessages(null)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        isComingFromNavigation = false
-        updateClearButtonVisibility(queryInput.text.toString())
     }
 
     private fun initViews(view: View) {
@@ -134,9 +105,8 @@ class SearchFragment : Fragment() {
 
     private fun setupClickListeners() {
         clearHistoryButton.setOnClickListener {
-            hideSearchHistory()
             searchViewModel.clearSearchHistory()
-            showSearchHistoryAsync()
+            hideSearchHistory()
         }
 
         clearButton.setOnClickListener {
@@ -153,6 +123,12 @@ class SearchFragment : Fragment() {
                 performSearch(currentQuery)
             }
         }
+
+        queryInput.setOnClickListener {
+            if (queryInput.text.isNullOrEmpty()) {
+                showSearchHistoryAsync()
+            }
+        }
     }
 
     private fun setupSearchField() {
@@ -164,49 +140,61 @@ class SearchFragment : Fragment() {
 
         queryInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
-                handler.removeCallbacksAndMessages(null)
-                performSearch(queryInput.text.toString().trim())
+                val query = queryInput.text.toString().trim()
+                if (query.isNotEmpty()) {
+                    performSearch(query)
+                    hideKeyboard()
+                }
                 true
             } else {
                 false
             }
         }
 
-        queryInput.addTextChangedListener(object : TextWatcher {
-            private var lastText = ""
+        val searchFlow = callbackFlow<String> {
+            val textWatcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val currentText = s?.toString() ?: ""
+                    trySend(currentText)
+                    updateClearButtonVisibility(currentText)
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (isComingFromNavigation || System.currentTimeMillis() - lastNavigationTime < 300) {
-                    return
-                }
-
-                val currentText = s?.toString() ?: ""
-                updateClearButtonVisibility(currentText)
-                handler.removeCallbacksAndMessages(null)
-
-                if (currentText.isEmpty()) {
-                    showSearchHistoryAsync()
-                    return
-                }
-
-                lastText = currentText
-                handler.postDelayed({
-                    if (!isComingFromNavigation && lastText == currentText) {
-                        performSearch(currentText.trim())
+                    if (currentText.isEmpty()) {
+                        isUserTyping = false
+                        showSearchHistoryAsync()
+                    } else {
+                        isUserTyping = true
+                        hideSearchHistory()
                     }
-                }, debounceDelay)
-            }
+                }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+                override fun afterTextChanged(s: Editable?) {}
+            }
+            queryInput.addTextChangedListener(textWatcher)
+            awaitClose { queryInput.removeTextChangedListener(textWatcher) }
+        }
+
+        searchFlow
+            .debounce(debounceDelay)
+            .distinctUntilChanged()
+            .onEach { query ->
+                if (query.isNotEmpty()) {
+                    performSearch(query)
+                } else {
+                    showSearchHistoryAsync()
+                }
+                isUserTyping = false
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
+
     private fun updateClearButtonVisibility(text: String) {
         clearButton.visibility = if (text.isEmpty()) View.GONE else View.VISIBLE
     }
+
     private fun performSearch(query: String) {
-        if (query.isEmpty() || isComingFromNavigation) {
+        if (query.isEmpty()) {
             showSearchHistoryAsync()
             return
         }
@@ -216,21 +204,23 @@ class SearchFragment : Fragment() {
     }
 
     private fun showSearchHistoryAsync() {
-        if (queryInput.text.isNotEmpty()) return
+        if (isUserTyping || !queryInput.text.isNullOrEmpty()) return
 
-        uiScope.launch {
+        lifecycleScope.launch {
             searchViewModel.loadSearchHistory()
             val state = searchViewModel.screenState.value
             if (state?.historyList?.isNotEmpty() == true) {
-                historyLayout.visibility = View.VISIBLE
-                historyTitle.visibility = View.VISIBLE
-                clearHistoryButton.visibility = View.VISIBLE
+                showSearchHistory()
             } else {
-                historyLayout.visibility = View.GONE
-                historyTitle.visibility = View.GONE
-                clearHistoryButton.visibility = View.GONE
+                hideSearchHistory()
             }
         }
+    }
+
+    private fun showSearchHistory() {
+        historyLayout.visibility = View.VISIBLE
+        historyTitle.visibility = View.VISIBLE
+        clearHistoryButton.visibility = View.VISIBLE
     }
 
     private fun hideSearchHistory() {
@@ -258,6 +248,9 @@ class SearchFragment : Fragment() {
 
         state.historyList?.let { historyList ->
             historyAdapter.updateTracks(historyList)
+            if (historyList.isNotEmpty() && queryInput.text.isNullOrEmpty() && !isUserTyping) {
+                showSearchHistory()
+            }
         }
     }
 
@@ -271,7 +264,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun navigateToPlayer(track: TrackParcelable) {
-        isComingFromNavigation = true
         val direction = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
         findNavController().navigate(direction)
     }

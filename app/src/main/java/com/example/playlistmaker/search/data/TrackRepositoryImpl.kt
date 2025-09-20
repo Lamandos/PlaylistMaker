@@ -1,8 +1,9 @@
 package com.example.playlistmaker.search.data
 
-
 import com.example.playlistmaker.search.domain.TrackRepository
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 
 class TrackRepositoryImpl(
@@ -10,15 +11,16 @@ class TrackRepositoryImpl(
     private val mapper: TrackMapper
 ) : TrackRepository {
 
-    override suspend fun searchTracks(query: String): List<Track> {
+    override suspend fun searchTracks(query: String): Flow<List<Track>> = flow {
         val response: Response<SearchResponse> = apiService.searchTracks(query)
 
         if (response.isSuccessful) {
-            return response.body()?.results?.map { dto ->
+            val tracks = response.body()?.results?.map { dto ->
                 mapper.mapDtoToDomain(dto)
             } ?: emptyList()
+            emit(tracks)
         } else {
-            throw Exception()
+            emit(emptyList())
         }
     }
 }

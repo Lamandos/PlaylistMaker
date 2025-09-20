@@ -1,11 +1,14 @@
 package com.example.playlistmaker.player.domain
 
+import com.example.playlistmaker.player.PlayerState
+import kotlinx.coroutines.flow.Flow
+
 interface PlayerInteractor {
-    fun prepare(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit)
+    fun prepare(url: String): Flow<PlayerState>
+    fun observeProgress(): Flow<String>
+    fun observeCompletion(): Flow<Unit>
     fun play()
     fun pause()
     fun release()
-    fun isPlaying(): Boolean
-    fun currentPosition(): Int
-    fun seekTo(position: Int)
+    fun seekTo(positionMs: Int)
 }
