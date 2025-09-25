@@ -17,6 +17,6 @@ val dataModuleSearch = module {
 
     single { TrackMapper() }
 
-    factory<TrackRepository> { TrackRepositoryImpl(get(), get()) }
-    factory<SearchRepository> { SearchRepositoryImpl(get(), get()) }
+    factory<TrackRepository> { TrackRepositoryImpl(get(), get(), get()) }
+    factory<SearchRepository> { SearchRepositoryImpl(get(), get(), get()) }
 }

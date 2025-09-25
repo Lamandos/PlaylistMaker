@@ -15,29 +15,3 @@ data class TrackDto(
     @SerializedName("country") val country: String,
     @SerializedName("releaseDate") val date: String?
 )
-    fun TrackDto.toDomain(): Track {
-        return Track(
-        trackName = name,
-        artistName = artist,
-        trackTimeMillis = duration,
-        artworkUrl100 = artwork,
-        collectionName = album,
-        primaryGenreName = genre,
-        previewUrl = preview,
-        country = country,
-        releaseDate = date
-    )
-}
-fun TrackDto.toParcelable(): TrackParcelable {
-    return TrackParcelable(
-        trackName = this.name,
-        artistName = this.artist,
-        trackTimeMillis = this.duration,
-        artworkUrl100 = this.artwork,
-        collectionName = this.album,
-        releaseDate = this.date,
-        primaryGenreName = this.genre,
-        country = this.country,
-        previewUrl = this.preview
-    )
-}
