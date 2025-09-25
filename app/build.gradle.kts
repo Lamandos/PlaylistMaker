@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id ("kotlin-parcelize")
     id ("androidx.navigation.safeargs.kotlin")
+    id ("kotlin-kapt")
+
 }
 
 android {
@@ -42,6 +44,7 @@ android {
 }
 
 dependencies {
+
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation ("androidx.navigation:navigation-fragment-ktx:2.5.3")
     implementation ("androidx.navigation:navigation-ui-ktx:2.5.3")
@@ -69,4 +72,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // Room
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt ("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
 }

@@ -9,7 +9,11 @@
         android:id="@+id/mediaFragment"
         android:name="com.example.playlistmaker.media.ui.fragment.MediaFragment"
         android:label="Media"
-        tools:layout="@layout/fragment_media" />
+        tools:layout="@layout/fragment_media" >
+        <action
+            android:id="@+id/action_mediaFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchFragment"
@@ -35,4 +39,15 @@
             android:name="track"
             app:argType="com.example.playlistmaker.search.ui.TrackParcelable" />
     </fragment>
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.playlistmaker.media.ui.fragments.FavoritesFragment"
+        android:label="FavoritesFragment" >
+        <action
+            android:id="@+id/action_favoritesFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_playerFragment"
+        app:destination="@id/playerFragment" />
 </navigation>

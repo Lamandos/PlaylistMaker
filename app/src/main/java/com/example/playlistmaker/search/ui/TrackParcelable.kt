@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TrackParcelable(
+    val id: String,
     val trackName: String,
     val artistName: String,
     val trackTimeMillis: Long,
@@ -13,12 +14,14 @@ data class TrackParcelable(
     val releaseDate: String?,
     val primaryGenreName: String,
     val country: String,
-    val previewUrl: String
+    val previewUrl: String,
+    val isFavorite: Boolean
 ) : Parcelable
 
 
 fun TrackParcelable.toDomain(): Track {
     return Track(
+        id = this.id,
         trackName = this.trackName,
         artistName = this.artistName,
         trackTimeMillis = this.trackTimeMillis,
@@ -27,7 +30,7 @@ fun TrackParcelable.toDomain(): Track {
         releaseDate = this.releaseDate,
         primaryGenreName = this.primaryGenreName,
         country = this.country,
-        previewUrl = this.previewUrl
-
+        previewUrl = this.previewUrl,
+        isFavorite = this.isFavorite
     )
 }

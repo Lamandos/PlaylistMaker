@@ -14,6 +14,7 @@ import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.player.PlayerState
 import com.example.playlistmaker.player.ui.view_model.PlayerScreenState
 import com.example.playlistmaker.player.ui.view_model.PlayerViewModel
+import com.example.playlistmaker.search.domain.model.toTrack
 import com.example.playlistmaker.search.ui.TrackParcelable
 import com.example.playlistmaker.utils.dpToPx
 import com.example.playlistmaker.utils.formatTrackTime
@@ -58,7 +59,7 @@ class PlayerFragment : Fragment() {
             }
         )
 
-        viewModel.preparePlayer(track.previewUrl, track.trackName, track.artistName)
+        viewModel.preparePlayer(track.previewUrl, track.trackName, track.artistName, track.toTrack())
     }
 
     private fun setupUI(track: TrackParcelable) = with(binding) {
@@ -82,6 +83,9 @@ class PlayerFragment : Fragment() {
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(requireContext().dpToPx(16)))
             .into(albumCover)
+
+
+        updateFavoriteButton(track.isFavorite)
     }
 
     private fun initObservers() {
@@ -98,11 +102,25 @@ class PlayerFragment : Fragment() {
             }
         )
         timer.text = state.currentTime
+        updateFavoriteButton(state.isFavorite)
     }
+    private fun updateFavoriteButton(isFavorite: Boolean) {
+        val imageRes = if (isFavorite) {
+            R.drawable.heart_btn_fill
+        } else {
+            R.drawable.heart_btn
+        }
 
+        binding.likeButton.setImageResource(imageRes)
+    }
     private fun initListeners() = with(binding) {
         playButton.setOnClickListener { viewModel.togglePlayback() }
         backButton.setOnClickListener { findNavController().popBackStack() }
+        likeButton.setOnClickListener {
+            likeButton.isEnabled = false
+            viewModel.onFavoriteClicked()
+            likeButton.postDelayed({ likeButton.isEnabled = true }, 300)
+        }
     }
 
     override fun onPause() {

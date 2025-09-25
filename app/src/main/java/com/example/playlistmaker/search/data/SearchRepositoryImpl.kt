@@ -1,5 +1,6 @@
 package com.example.playlistmaker.search.data
 
+import com.example.playlistmaker.db.data.AppDatabase
 import com.example.playlistmaker.search.domain.SearchRepository
 import com.example.playlistmaker.search.domain.TrackRepository
 import com.example.playlistmaker.search.domain.model.Track
@@ -7,7 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 class SearchRepositoryImpl(
     private val trackRepository: TrackRepository,
-    private val searchHistoryRepository: SearchHistoryRepository
+    private val searchHistoryRepository: SearchHistoryRepository,
+    private val appDatabase: AppDatabase
 ) : SearchRepository {
 
     override suspend fun searchTracks(query: String): Flow<List<Track>> {
@@ -15,7 +17,7 @@ class SearchRepositoryImpl(
     }
 
     override suspend fun addToSearchHistory(track: Track) {
-        searchHistoryRepository.addToSearchHistory(track)
+        searchHistoryRepository.addToSearchHistory(track, appDatabase)
     }
 
     override suspend fun clearSearchHistory() {
@@ -23,6 +25,6 @@ class SearchRepositoryImpl(
     }
 
     override suspend fun getSearchHistory(): List<Track> {
-        return searchHistoryRepository.getSearchHistory()
+        return searchHistoryRepository.getSearchHistory(appDatabase)
     }
 }

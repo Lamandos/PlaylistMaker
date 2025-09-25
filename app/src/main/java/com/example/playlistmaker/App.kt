@@ -3,6 +3,9 @@ package com.example.playlistmaker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.db.di.dataModule
+import com.example.playlistmaker.db.di.repositoryModule
+import com.example.playlistmaker.db.domain.domainModule
 import com.example.playlistmaker.media.di.uiModuleMedia
 import com.example.playlistmaker.player.di.dataModulePlayer
 import com.example.playlistmaker.player.di.domainModulePlayer
@@ -27,7 +30,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(dataModulePlayer, domainModulePlayer, uiModulePlayer,
+            modules(repositoryModule, domainModule, dataModule, dataModulePlayer, domainModulePlayer, uiModulePlayer,
                 dataModuleSettings, domainModuleSettings, uiModuleSettings, sharingModule,
                 networkModule, dataModuleSearch, domainModuleSearch, uiModuleSearch, uiModuleMedia)
         }
