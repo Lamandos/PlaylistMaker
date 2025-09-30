@@ -59,6 +59,7 @@ class TrackMapper {
         )
     }
 
+
     fun mapDtoToParcelable(dto: TrackDto): TrackParcelable {
         return mapDomainToParcelable(mapDtoToDomain(dto))
     }

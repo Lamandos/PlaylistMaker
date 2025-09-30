@@ -21,4 +21,8 @@
     <dimen name="error_text">20dp</dimen>
     <dimen name="pb_size">44dp</dimen>
     <dimen name="pb_top">140dp</dimen>
+    <dimen name="img_container">312dp</dimen>
+    <dimen name="playlist_name_width">328dp</dimen>
+    <dimen name="playlist_name_height">56dp</dimen>
+    <dimen name="playlist_input_corners">3.5dp</dimen>
 </resources>

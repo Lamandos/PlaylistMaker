@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.db.domain.FavoriteTracksInteractor
 import com.example.playlistmaker.player.PlayerState
 import com.example.playlistmaker.player.domain.PlayerInteractor
+import com.example.playlistmaker.playlist.domain.Playlist
+import com.example.playlistmaker.playlist.domain.PlaylistRepository
+import com.example.playlistmaker.playlist.domain.toEntity
 import com.example.playlistmaker.search.domain.model.Track
 import kotlinx.coroutines.launch
 
@@ -20,12 +23,15 @@ data class PlayerScreenState(
 
 class PlayerViewModel(
     private val interactor: PlayerInteractor,
-    private val favoriteInteractor: FavoriteTracksInteractor
+    private val favoriteInteractor: FavoriteTracksInteractor,
+    private val playlistRepository: PlaylistRepository
 ) : ViewModel() {
-
+    private val _playlists = MutableLiveData<List<Playlist>>()
+    val playlists: LiveData<List<Playlist>> = _playlists
     private val _screenState = MutableLiveData<PlayerScreenState>()
     val screenState: LiveData<PlayerScreenState> = _screenState
-
+    private val _trackAddStatus = MutableLiveData<Pair<Long, Boolean>>()
+    val trackAddStatus: LiveData<Pair<Long, Boolean>> = _trackAddStatus
     private var currentTrack: Track? = null
     private var currentUrl: String = ""
     fun preparePlayer(url: String, title: String, artist: String, track: Track) {
@@ -112,7 +118,12 @@ class PlayerViewModel(
     fun release() {
         interactor.release()
     }
-
+    fun loadPlaylists() {
+        viewModelScope.launch {
+            val playlists = playlistRepository.getAllPlaylists()
+            _playlists.postValue(playlists)
+        }
+    }
     fun onFavoriteClicked() {
         val track = currentTrack ?: return
 
@@ -134,6 +145,12 @@ class PlayerViewModel(
             _screenState.postValue(
                 _screenState.value?.copy(isFavorite = newIsFavorite)
             )
+        }
+    }
+    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        viewModelScope.launch {
+            val updated = playlistRepository.addTrackToPlaylist(track, playlist.toEntity())
+            _trackAddStatus.value = playlist.id to updated
         }
     }
 }

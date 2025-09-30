@@ -40,10 +40,13 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(bottomNavigationView, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.playerFragment) {
-                hideBottomNavigationView()
-            } else {
-                showBottomNavigationView()
+            when (destination.id) {
+                R.id.playerFragment, R.id.playlistFragment -> {
+                    hideBottomNavigationView()
+                }
+                else -> {
+                    showBottomNavigationView()
+                }
             }
         }
     }

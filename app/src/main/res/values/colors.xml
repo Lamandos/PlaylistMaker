@@ -11,4 +11,6 @@
     <color name="bottom_nav_text_active">@color/blue</color>
     <color name="bottom_nav_text_inactive">@color/yp_black</color>
     <color name="bottom_nav_background">@color/white</color>
+    <color name="playlist_box">@color/yp_gray</color>
+    <color name="playlist_bk_btn">@color/yp_black</color>
 </resources>
