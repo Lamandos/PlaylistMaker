@@ -1,3 +1,5 @@
+package com.example.playlistmaker.playlist.ui.view_model
+
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -10,15 +12,15 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
-class PlaylistViewModel(
+open class PlaylistViewModel(
     application: Application,
-    private val playlistInteractor: PlaylistInteractor
+    open val playlistInteractor: PlaylistInteractor
 ) : AndroidViewModel(application) {
 
-    private val _isPlaylistCreated = MutableLiveData<Boolean>()
+    protected val _isPlaylistCreated = MutableLiveData<Boolean>()
     val isPlaylistCreated: MutableLiveData<Boolean> = _isPlaylistCreated
 
-    private val _createdPlaylistName = MutableLiveData<String>()
+    protected val _createdPlaylistName = MutableLiveData<String>()
     val createdPlaylistName: MutableLiveData<String> = _createdPlaylistName
 
     fun saveCoverImage(uri: Uri): String {

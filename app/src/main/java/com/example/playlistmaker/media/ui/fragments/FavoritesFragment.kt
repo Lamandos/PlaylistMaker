@@ -40,9 +40,12 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = TrackAdapter(mutableListOf()) { track ->
-            navigateToPlayer(track)
-        }
+        adapter = TrackAdapter(mutableListOf(),
+            onTrackClick = { track ->
+                navigateToPlayer(track)
+            },
+            onTrackLongClick = {  }
+        )
         binding.favoritesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.favoritesRecyclerView.adapter = adapter
     }

@@ -212,4 +212,22 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="textAllCaps">false</item>
     </style>
+    <style name="playlist_description">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+    <style name="playlist_title">
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/ys_display_bold</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

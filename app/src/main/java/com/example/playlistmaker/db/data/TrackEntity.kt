@@ -18,7 +18,8 @@ data class TrackEntity(
     val duration: Long,
     val previewUrl: String,
     val dateAdded: Long,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val trackOrder: Long
 )
 fun TrackEntity.toTrack(): Track {
     return Track(
@@ -33,6 +34,7 @@ fun TrackEntity.toTrack(): Track {
         previewUrl = previewUrl,
         id = id,
         dateAdded = dateAdded,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        trackOrder = trackOrder
     )
 }

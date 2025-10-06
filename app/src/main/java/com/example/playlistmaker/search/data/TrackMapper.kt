@@ -23,7 +23,8 @@ class TrackMapper {
             country = dto.country ?: "",
             previewUrl = dto.preview ?: "",
             isFavorite = false,
-            dateAdded = System.currentTimeMillis()
+            dateAdded = System.currentTimeMillis(),
+            trackOrder = dto.trackOrder ?: 0
         )
     }
 
@@ -39,7 +40,8 @@ class TrackMapper {
             primaryGenreName = domain.primaryGenreName,
             country = domain.country,
             previewUrl = domain.previewUrl,
-            isFavorite = domain.isFavorite
+            isFavorite = domain.isFavorite,
+            trackOrder = domain.trackOrder
         )
     }
 
@@ -55,10 +57,10 @@ class TrackMapper {
             primaryGenreName = parcelable.primaryGenreName,
             country = parcelable.country,
             previewUrl = parcelable.previewUrl,
-            isFavorite = false
+            isFavorite = false,
+            trackOrder = parcelable.trackOrder
         )
     }
-
 
     fun mapDtoToParcelable(dto: TrackDto): TrackParcelable {
         return mapDomainToParcelable(mapDtoToDomain(dto))

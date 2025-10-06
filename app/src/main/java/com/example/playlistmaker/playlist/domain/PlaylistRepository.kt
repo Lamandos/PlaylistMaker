@@ -7,7 +7,6 @@ import com.example.playlistmaker.db.data.PlaylistTrackEntity
 import com.example.playlistmaker.db.data.PlaylistTrackRelation
 import com.example.playlistmaker.search.domain.model.Track
 
-
 class PlaylistRepository(
     private val playlistDao: PlaylistDao,
     private val playlistTrackDao: PlaylistTrackDao
@@ -35,6 +34,9 @@ class PlaylistRepository(
             return false
         }
 
+        val maxTrackOrder = playlistTrackDao.getMaxTrackOrder(playlist.id) ?: 0
+        val newTrackOrder = maxTrackOrder + 1
+
         val existingTrack = playlistTrackDao.getTrackById(track.id)
         if (existingTrack == null) {
             val playlistTrackEntity = PlaylistTrackEntity(
@@ -53,7 +55,7 @@ class PlaylistRepository(
             playlistTrackDao.insertTrack(playlistTrackEntity)
         }
 
-        playlistTrackDao.insertRelation(PlaylistTrackRelation(playlist.id, track.id))
+        playlistTrackDao.insertRelation(PlaylistTrackRelation(playlist.id, track.id, newTrackOrder))
 
         val trackCount = playlistTrackDao.getTrackCount(playlist.id)
         val updatedPlaylist = playlist.copy(trackCount = trackCount)
@@ -74,8 +76,46 @@ class PlaylistRepository(
                 releaseDate = entity.releaseDate,
                 primaryGenreName = entity.genre,
                 country = entity.country,
-                previewUrl = entity.previewUrl
+                previewUrl = entity.previewUrl,
+                trackOrder = entity.track_order
             )
         }
+    }
+
+
+    suspend fun checkAndDeleteTrackIfUnused(trackId: String) {
+        val playlists = playlistDao.getAllPlaylists()
+
+        val isTrackUsedInAnyPlaylist = playlists.any { playlist ->
+            playlistTrackDao.getRelation(playlist.id, trackId) != null
+        }
+
+        if (!isTrackUsedInAnyPlaylist) {
+            playlistTrackDao.deleteTrackById(trackId)
+        }
+    }
+
+    suspend fun deleteTrackFromPlaylist(trackId: String, playlistId: Long) {
+
+        playlistTrackDao.removeTrackFromPlaylist(playlistId, trackId)
+
+        val trackCount = playlistTrackDao.getTrackCount(playlistId)
+        val playlist = playlistDao.getPlaylistById(playlistId) ?: return
+        val updatedPlaylist = playlist.copy(trackCount = trackCount)
+        playlistDao.update(updatedPlaylist)
+    }
+
+    suspend fun deletePlaylist(id: Long) {
+        val playlist = playlistDao.getPlaylistById(id) ?: return
+
+        val playlistTracks = playlistTrackDao.getTracksByPlaylistId(id)
+
+        playlistTrackDao.removeTracksFromPlaylist(id)
+
+        playlistTracks.forEach { track ->
+            checkAndDeleteTrackIfUnused(track.id)
+        }
+
+        playlistDao.delete(playlist)
     }
 }

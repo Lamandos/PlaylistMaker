@@ -33,12 +33,18 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : Fragment() {
 
     private val searchViewModel: SearchViewModel by viewModel()
-    private val trackAdapter = TrackAdapter(mutableListOf()) { track ->
-        handleTrackClick(track)
-    }
-    private val historyAdapter = TrackAdapter(mutableListOf()) { track ->
-        handleTrackClick(track)
-    }
+    private val trackAdapter = TrackAdapter(mutableListOf(),
+        onTrackClick = { track ->
+            handleTrackClick(track)
+        },
+        onTrackLongClick = { }
+    )
+    private val historyAdapter = TrackAdapter(mutableListOf(),
+        onTrackClick = { track ->
+            handleTrackClick(track)
+        },
+        onTrackLongClick = {  }
+    )
 
     private lateinit var queryInput: EditText
     private lateinit var clearButton: ImageView

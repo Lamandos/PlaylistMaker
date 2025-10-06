@@ -15,7 +15,8 @@ data class TrackParcelable(
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val trackOrder: Long
 ) : Parcelable
 
 
@@ -31,6 +32,7 @@ fun TrackParcelable.toDomain(): Track {
         primaryGenreName = this.primaryGenreName,
         country = this.country,
         previewUrl = this.previewUrl,
-        isFavorite = this.isFavorite
+        isFavorite = this.isFavorite,
+        trackOrder = this.trackOrder
     )
 }

@@ -9,7 +9,8 @@ import com.example.playlistmaker.utils.formatTrackTime
 
 class TrackViewHolder(
     private val binding: TrackBinding,
-    private val onTrackClick: (TrackParcelable) -> Unit
+    private val onTrackClick: (TrackParcelable) -> Unit,
+    private val onLongClick: (TrackParcelable) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(track: TrackParcelable) {
@@ -26,6 +27,11 @@ class TrackViewHolder(
 
         binding.root.setOnClickListener {
             onTrackClick(track)
+        }
+
+        binding.root.setOnLongClickListener {
+            onLongClick(track)
+            true
         }
     }
 }
