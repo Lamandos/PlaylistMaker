@@ -1,4 +1,3 @@
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,9 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.playlist.ui.model.PlaylistUi
 
-class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
+class PlaylistAdapter(
+    private val onItemClick: (Long) -> Unit
+) : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
 
     private val items = mutableListOf<PlaylistUi>()
 
@@ -58,7 +59,12 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
             } else {
                 cover.setImageResource(R.drawable.placeholder)
             }
+
+            itemView.setOnClickListener {
+                onItemClick(item.id)
+            }
         }
+
         private fun getTrackWordForm(count: Int): String {
             val rem100 = count % 100
             val rem10 = count % 10
@@ -71,3 +77,4 @@ class PlaylistAdapter : RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>
         }
     }
 }
+

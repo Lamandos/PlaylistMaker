@@ -13,4 +13,5 @@
     <color name="bottom_nav_background">@color/yp_black</color>
     <color name="playlist_box">@color/white</color>
     <color name="playlist_bk_btn">@color/white</color>
+    <color name="default_status_bar">@color/yp_black</color>
 </resources>

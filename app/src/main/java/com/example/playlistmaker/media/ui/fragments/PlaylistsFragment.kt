@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.example.playlistmaker.media.ui.fragment.MediaFragmentDirections
 import com.example.playlistmaker.media.ui.view_model.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -41,7 +42,12 @@ class PlaylistsFragment : Fragment() {
             requireParentFragment().findNavController().navigate(R.id.action_mediaFragment_to_playlistFragment)
         }
 
-        adapter = PlaylistAdapter()
+        adapter = PlaylistAdapter { playlistId ->
+            val action = MediaFragmentDirections
+                .actionMediaFragmentToPlaylistTracksFragment(playlistId = playlistId)
+            findNavController().navigate(action)
+        }
+
         binding.playlistRecycler.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.playlistRecycler.adapter = adapter
     }

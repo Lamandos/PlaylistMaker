@@ -10,6 +10,7 @@ import com.example.playlistmaker.media.di.uiModuleMedia
 import com.example.playlistmaker.player.di.dataModulePlayer
 import com.example.playlistmaker.player.di.domainModulePlayer
 import com.example.playlistmaker.player.di.uiModulePlayer
+import com.example.playlistmaker.playlist_tracks.ui.module.playlistTracksModule
 import com.example.playlistmaker.search.di.dataModuleSearch
 import com.example.playlistmaker.search.di.domainModuleSearch
 import com.example.playlistmaker.search.di.networkModule
@@ -30,7 +31,7 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(repositoryModule, domainModule, dataModule, dataModulePlayer, domainModulePlayer, uiModulePlayer,
+            modules(playlistTracksModule,repositoryModule, domainModule, dataModule, dataModulePlayer, domainModulePlayer, uiModulePlayer,
                 dataModuleSettings, domainModuleSettings, uiModuleSettings, sharingModule,
                 networkModule, dataModuleSearch, domainModuleSearch, uiModuleSearch, uiModuleMedia)
         }

@@ -1,6 +1,6 @@
 package com.example.playlistmaker.playlist.ui.fragments
 
-import PlaylistViewModel
+
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
@@ -21,15 +21,16 @@ import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.db.data.AppDatabasePlaylist
 import com.example.playlistmaker.playlist.domain.PlaylistInteractor
 import com.example.playlistmaker.playlist.domain.PlaylistRepository
+import com.example.playlistmaker.playlist.ui.view_model.PlaylistViewModel
 
-class PlaylistFragment : Fragment() {
+open class PlaylistFragment : Fragment() {
 
-    private var _binding: FragmentPlaylistBinding? = null
-    private val binding get() = _binding!!
-    private var selectedCoverImageUri: Uri? = null
-    private lateinit var viewModel: PlaylistViewModel
+    protected var _binding: FragmentPlaylistBinding? = null
+    protected val binding get() = _binding!!
+    protected var selectedCoverImageUri: Uri? = null
+    protected lateinit var viewModel: PlaylistViewModel
 
-    private val pickImageLauncher =
+    protected val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 selectedCoverImageUri = it
@@ -104,7 +105,7 @@ class PlaylistFragment : Fragment() {
         )
     }
 
-    private fun handleBack() {
+    open fun handleBack() {
         if (hasUnsavedData()) {
             showExitDialog()
         } else {

@@ -6,6 +6,7 @@ import com.example.playlistmaker.media.ui.view_model.MediaViewModel
 import com.example.playlistmaker.media.ui.view_model.PlaylistsViewModel
 import com.example.playlistmaker.playlist.domain.PlaylistInteractor
 import com.example.playlistmaker.playlist.domain.PlaylistRepository
+import com.example.playlistmaker.playlist.ui.view_model.EditPlaylistViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -14,9 +15,10 @@ val uiModuleMedia = module {
     viewModel { MediaViewModel() }
     viewModel { FavoritesViewModel(get()) }
     viewModel { PlaylistsViewModel(get()) }
+    viewModel { EditPlaylistViewModel( get(), get()) }
     single { AppDatabasePlaylist.getDatabase(androidContext()) }
     single { get<AppDatabasePlaylist>().playlistDao() }
-    single { get<AppDatabasePlaylist>().playlistTrackDao() } // <--- сюда
+    single { get<AppDatabasePlaylist>().playlistTrackDao() }
     single { PlaylistRepository(get(), get()) }
     single { PlaylistInteractor(get()) }
 

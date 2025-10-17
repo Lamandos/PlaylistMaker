@@ -3,7 +3,6 @@ package com.example.playlistmaker.search.domain.model
 import com.example.playlistmaker.db.data.TrackEntity
 import com.example.playlistmaker.search.ui.TrackParcelable
 
-
 data class Track(
     val trackName: String,
     val artistName: String,
@@ -16,8 +15,10 @@ data class Track(
     val previewUrl: String,
     val id: String,
     val dateAdded: Long = System.currentTimeMillis(),
-    var isFavorite: Boolean = false
+    var isFavorite: Boolean = false,
+    val trackOrder: Long
 )
+
 fun Track.toParcelable(): TrackParcelable {
     return TrackParcelable(
         trackName = trackName,
@@ -30,7 +31,8 @@ fun Track.toParcelable(): TrackParcelable {
         country = country,
         previewUrl = previewUrl,
         id = id,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        trackOrder = trackOrder
     )
 }
 
@@ -47,9 +49,11 @@ fun Track.toEntity(): TrackEntity {
         duration = trackTimeMillis,
         previewUrl = previewUrl,
         dateAdded = dateAdded,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        trackOrder = trackOrder
     )
 }
+
 fun TrackParcelable.toTrack(): Track {
     return Track(
         trackName = trackName,
@@ -62,6 +66,7 @@ fun TrackParcelable.toTrack(): Track {
         country = country,
         previewUrl = previewUrl,
         id = id,
-        isFavorite = isFavorite
+        isFavorite = isFavorite,
+        trackOrder = trackOrder
     )
 }

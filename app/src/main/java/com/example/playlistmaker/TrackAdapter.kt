@@ -11,17 +11,19 @@ import com.example.playlistmaker.search.ui.TrackViewHolder
 
 class TrackAdapter(
     private var tracks: MutableList<TrackParcelable>,
-    private val onTrackClick: (TrackParcelable) -> Unit
+    private val onTrackClick: (TrackParcelable) -> Unit,
+    private val onTrackLongClick: (TrackParcelable) -> Unit
 ) : RecyclerView.Adapter<TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = TrackBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TrackViewHolder(binding, onTrackClick)
+        return TrackViewHolder(binding, onTrackClick, onTrackLongClick)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
         holder.bind(track)
+
     }
 
     override fun getItemCount(): Int = tracks.size

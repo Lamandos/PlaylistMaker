@@ -13,5 +13,6 @@ data class TrackDto(
     @SerializedName("primaryGenreName") val genre: String,
     @SerializedName("previewUrl") val preview: String,
     @SerializedName("country") val country: String,
-    @SerializedName("releaseDate") val date: String?
+    @SerializedName("releaseDate") val date: String?,
+    @SerializedName("trackOrder") val trackOrder: Long?
 )
